@@ -1,0 +1,46 @@
+\section{操作符重载}
+我们之前已经看到+运算符不但能加数字，还能连接字符串。这之所以可能，是以为+运算符在int类和str类中都被重载。运算符实际上对应着类中相应的方法。为运算符定义方法就是所谓的运算符重载。比如，为让自定义对象能使用+运算符，我们需要定义名叫\_\_add\_\_的方法。
+
+让我们看个例子：
+
+\begin{lstlisting}
+import math
+
+
+class Circle:
+
+    def __init__(self, radius):
+        self.__radius = radius
+
+    def setRadius(self, radius):
+        self.__radius = radius
+
+    def getRadius(self):
+        return self.__radius
+
+    def area(self):
+        return math.pi * self.__radius ** 2
+
+    def __add__(self, another_circle):
+        return Circle(self.__radius + another_circle.__radius)
+
+c1 = Circle(4)
+print(c1.getRadius())
+
+c2 = Circle(5)
+print(c2.getRadius())
+
+c3 = c1 + c2  # 之所以能使用加法运算符，是因为我们定义了__add__方法
+print(c3.getRadius())
+
+\end{lstlisting}
+
+在上面的例子中，我们为类添加了\_\_add\_\_方法，该方法允许使用+运算符对两个circle对象求和。在\_\_add\_\_方法中，我们创建了一个新的对象，并将其返回给调用者。运行结果如下：
+
+\begin{lstlisting}
+4
+5
+9
+\end{lstlisting}
+
+在Python中，除\_\_add\_\_方法对应+运算符之外，还有其他能够重载运算符的方法：如\_\_mul\_\_、\_\_sub\_\_等等\cite{thepythonguru，2015}。

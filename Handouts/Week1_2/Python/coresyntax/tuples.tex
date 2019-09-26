@@ -1,0 +1,27 @@
+\section{元组}
+
+在Python中，元组（Tuple）和列表非常相似，与列表不同的是，元组一旦创立，就不可改变，也就是说，元组是不可变的。
+
+\subsection{创建元组}
+
+\begin{lstlisting}
+>>> t1 = () 							# 创建一个空元组
+>>> t2 = (11,22,33) 			# 创建一个包含三个元素的元组
+>>> t3 = tuple([1,2,3,4]) # 使用列表创建元组
+>>> t4 = tuple("abc") 		# 使用字符串创建元组
+\end{lstlisting}
+
+\subsection{元组相关方法}
+元组也是序列，因此序列能使用的方法，如max , min , len , sum方法元组也能使用。
+
+\begin{lstlisting}
+>>> t1 = (1, 12, 55, 12, 81)
+>>> min(t1)
+1
+>>> max(t1)
+81
+>>> sum(t1)
+161
+>>> len(t1)
+5
+\end{lstlisting}

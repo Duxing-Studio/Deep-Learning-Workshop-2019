@@ -1,0 +1,146 @@
+\section{继承和多态}
+
+继承（inheritance）允许开发人员先创建一个通用的类，然后扩展为特定类。使用继承机制，我们可以获得类的数据字段和方法，还可以增加自定义的字段和方法，因此，继承提供了一种组织代码、重用代码的方式。
+
+在面向对象的术语中，当类X继承自类Y时，Y被叫做超类（super class）或基类（base class），而X被成为子类（subclass）或者衍生类（derived class）。
+\begin{myremark}{}
+私有数据字段和私有方法只在类的内部使用。子类只能继承父类的非私有数据字段和非私有方法。
+\end{myremark}
+
+继承的语法如下：
+
+\begin{lstlisting}
+class SubClass(SuperClass):
+  # data fields
+  # instance methods
+\end{lstlisting}
+
+让我们看个例子：
+
+\begin{lstlisting}
+class Vehicle:
+
+    def __init__(self, name, color):
+        self.__name = name      # __name是私有数据字段
+        self.__color = color
+
+    def getColor(self):
+        return self.__color
+
+    def setColor(self, color):
+        self.__color = color
+
+    def getName(self):
+        return self.__name
+
+
+class Car(Vehicle):
+
+    def __init__(self, name, color, model):
+        # 调用父类的构造方法
+        super().__init__(name, color)
+        self.__model = model
+
+    def getDescription(self):
+        return self.getName() + self.__model + " in " + self.getColor() + " color"
+
+c = Car("Ford Mustang", "red", "GT350")
+print(c.getDescription())
+print(c.getName())
+\end{lstlisting}
+
+上述代码中，我们创建了基类Vehicle和子类Car。在子类Car中，我们没有定义getName()方法，但我们仍然可以访问getName()，这是因为类Car继承自Vehicle类。在这段代码中，super()方法用来调用基类的方法。上述代码的运行结果如下：
+
+\begin{lstlisting}
+Ford MustangGT350 in red color
+Ford Mustang
+\end{lstlisting}
+
+\subsection{多重继承}
+不像Java和C\#语言，Python允许多重继承。即一次继承多个基类，比如：
+
+\begin{lstlisting}
+class Subclass(SuperClass1, SuperClass2, ...):
+   # initializer
+   # methods
+\end{lstlisting}
+
+看如下实例：
+
+\begin{lstlisting}
+class MySuperClass1():
+
+    def method_super1(self):
+        print("method_super1 method called")
+
+
+class MySuperClass2():
+
+    def method_super2(self):
+        print("method_super2 method called")
+
+
+class ChildClass(MySuperClass1, MySuperClass2):
+
+    def child_method(self):
+        print("child method")
+
+c = ChildClass()
+c.method_super1()
+c.method_super2()
+
+\end{lstlisting}
+
+输出结果为：
+
+\begin{lstlisting}
+method_super1 method called
+method_super2 method called
+\end{lstlisting}
+
+因为子类ChildClass继承自MySuperClass1 , MySuperClass2，因此，ChildClass对象c可以访问method\_super1()方法和 method\_super2()方法。
+
+\subsection{重写方法}
+为重写基类的某个方法，子类需要定义一个同名的方法（即拥有相同名称和相同数量的参数）。例如：
+
+\begin{lstlisting}
+class A():
+
+    def __init__(self):
+        self.__x = 1
+
+    def m1(self):
+        print("m1 from A")
+
+
+class B(A):
+
+    def __init__(self):
+        self.__y = 1
+
+    def m1(self):
+        print("m1 from B")
+
+c = B()
+c.m1()
+\end{lstlisting}
+在这段代码中，我们重写了基类的m1()方法。输出结果为：
+
+\begin{lstlisting}
+m1 from B
+\end{lstlisting}
+
+\subsection{判断对象是否属于某类}
+
+isinstance() 方法用来检测指定对象是否是某个类的实例。例如：
+
+\begin{lstlisting}
+>>> isinstance(1, int)
+True
+
+>>> isinstance(1.2, int)
+False
+
+>>> isinstance([1,2,3,4], list)
+True
+\end{lstlisting}

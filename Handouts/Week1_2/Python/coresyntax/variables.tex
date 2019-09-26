@@ -1,0 +1,124 @@
+\section{Python中的变量}
+
+\subsection{注释}
+
+在Python中，使用“\#”标记注释。注释不会被Python解释器执行。注释是开发人员用来提醒自己或他人程序如何工作的重要手段，注释还会用在文档的写作中。
+
+\begin{lstlisting}
+#display hello world
+print("hello world")
+\end{lstlisting}
+
+上述代码将会打印出hello world字符串。
+
+
+\begin{myremark}{物理行与逻辑行}
+
+所谓物理行（Physical Line）是你在编写程序时 你所看到 的内容。所谓逻辑行（Logical Line）是 Python 所看到 的单个语句。Python 会假定每一 物理行 会对应一个 逻辑行。
+有关逻辑行的一个例子是诸如 print('hello world') 这样一句语句——如果其本身是一行（正如你在编辑器里所看到的那样），那么它也对应着一行物理行。
+
+Python 之中暗含这样一种期望：Python 鼓励每一行使用一句独立语句从而使得代码更加可读。
+\end{myremark}
+\subsection{变量命名}
+
+变量（Vaiable）实质上是对内存中地址的命名，在内存中存储着诸多对象，为了方便使用这些对象，便有了变量。把变量和函数的名称我们叫作标识符（Identifier）。在Python中，标识符必须遵守以下规则：
+
+\begin{enumerate}
+	\item 所有标识符必须以字母或者下划线( \_ )开头，不能以数字开头。如 my\_var 就是一个有效的标识符，而 1digit 就不是。
+	\item 标识符可以包含字母、数字和下划线。标识符不限长度。
+	\item 标识符不能是关键字（所谓关键字，就是Python中已经使用并有特定含义的单词）。Python的关键字参见附录\ref{Python关键字}。
+\end{enumerate}
+
+\subsection{变量赋值}
+
+值（Value）是程序运行过程中的基本元素之一，例如1，3.14，"hello"等等都是值。在编程属于中，它们又被叫作字面量（literals）。字面量拥有不同的类型，如1是整型（int），3.14是浮点型（float），"hello"是字符串（string）。在之后的章节中，我们将详细学习数据类型。
+
+在Python中，无需声明变量类型，解释器会根据变量的值自动判断变量类型。使用等于号为变量赋值，等于号也被认为赋值操作符（operator）。以下是变量声明的一些例子：
+
+
+\begin{lstlisting}
+x = 100                       # x 是整型
+pi = 3.14                     # pi 是浮点类型
+empname = "python is great"   # empname 是字符串
+a = b = c = 100               # 将100赋值给a、b、c
+\end{lstlisting}
+
+注意，变量x中并不储存100自身，它存储的是100（它是一个整型对象）的引用（reference）地址。
+
+\subsection{同步赋值}
+
+Python可以使用以下语法对多个变量同步赋值：
+
+\begin{lstlisting}
+var1, var2, ..., varn = exp1, exp2, ..., expn
+\end{lstlisting}
+
+上述声明告诉Python，将表达式右边的值依次赋值给表达式左侧的变量。同步赋值在要交换两个变量的值时非常有用。例如：
+
+\begin{lstlisting}
+>>> x = 1
+>>> y = 2
+
+>>> y, x = x, y # 交换x、y的值
+
+>>> print(x)
+2
+>>> print(y)
+1
+\end{lstlisting}
+\begin{myremark}{}
+$>>>$是Python交互模式中的提示符。
+\end{myremark}
+\subsection{数据类型}
+Python拥有6种标准数据类型。
+\begin{enumerate}
+	\item Numbers，数字
+	\item String，字符串
+	\item List，列表
+	\item Tuple，元组
+	\item Dictionary，字典
+	\item Boolean，布尔值
+\end{enumerate}
+
+\subsection{从控制台中接受输入值}
+input()函数用来接受从控制台输入的值。它的用法如下：
+
+\begin{lstlisting}
+input([prompt]) -> string
+\end{lstlisting}
+
+\begin{myremark}{使用input()函数和用户进行交互}
+input()函数接受一个可选的字符串变量，用以提示输入内容，该函数返回值为字符串。
+\end{myremark}
+
+例如：
+
+\begin{lstlisting}
+>>> name = input("Enter your name: ")
+>>> Enter your name: tim
+>>> name
+'tim'
+\end{lstlisting}
+
+\subsection{引入模块}
+Python使用模块（module）组织代码。Python内置了许多常用的模块，比如math模块用来处理数学运算，re模块用来处理正则表达式等等。但是在使用这些模块之前，你需要使用以下语法引入这些模块：
+
+\begin{lstlisting}
+import module_name
+\end{lstlisting}
+
+你还可以使用以下语法导入多个模块：
+
+\begin{lstlisting}
+import module_name_1, module_name_2
+\end{lstlisting}
+
+例如：
+
+\begin{lstlisting}
+>>> import math
+>>> math.pi
+3.141592653589793
+\end{lstlisting}
+
+上述代码中的第一行引入了math模块，这样我们就可以使用math模块中的所有函数、类、变量和常量。为了使用math模块中的这些内容，我们需要在模块名称后使用( . )，然后就可以使用模块中定义的类、函数、常量或者变量了。在上面的例子中，math.pi表示math模块中的pi常量。

@@ -1,0 +1,33 @@
+%!TEX program = xelatex
+
+\documentclass[color=gray,base=hide,cn]{elegantbook}
+\usepackage{listings}
+\usepackage{tabularx}
+\newtheorem{myremark}{注脚}
+\lstset{
+	language         = Python,
+}
+
+\begin{document}
+
+\frontmatter % 开始前言目录，页码用罗马数字
+
+\title{Python基础教程}
+\author{杨志宏}
+\institute{西北民族大学}
+\date{\today}
+
+\maketitle
+
+\tableofcontents
+
+\mainmatter % 开始正文，页码用阿拉伯数字
+\include{HowToLearn/HowToLearn}
+\include{Python/Intro}
+\include{Python/CoreSyntax}
+\include{Python/oop}
+\include{Python/ExceptionHandling}
+\include{Python/module}
+\appendix
+\include{Python/keywords}
+\end{document}

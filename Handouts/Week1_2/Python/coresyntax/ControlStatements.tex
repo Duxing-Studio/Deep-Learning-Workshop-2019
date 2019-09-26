@@ -1,0 +1,68 @@
+\section{控制声明}
+在程序中，常常要根据一些条件执行相应的命令。
+
+\subsection{分支判断}
+Python使用if-else进行控制声明。语法如下：
+
+\begin{lstlisting}
+if boolean-expression:
+   #statements
+else:
+   #statements
+\end{lstlisting}
+
+\begin{myremark}{}
+在每一个if程序块中，必须使用相同数量的缩进，否则会产生语法错误。这是Python和其他语言非常不同的一点。
+\end{myremark}
+
+现在我们看一个例子：
+
+\begin{lstlisting}
+i = 11
+if i % 2 == 0:
+    print("偶数")
+else:
+    print("奇数")
+\end{lstlisting}
+
+运行结果将根据i的值发生变化。
+
+如果需要判断多个条件，我们就可以使用if-elif-else控制声明，例如：
+
+\begin{lstlisting}
+today = "monday"
+
+if today == "monday":
+   print("this is monday")
+elif today == "tuesday":
+   print("this is tuesday")
+elif today == "wednesday":
+   print("this is wednesday")
+elif today == "thursday":
+   print("this is thursday")
+elif today == "friday":
+   print("this is friday")
+elif today == "saturday":
+   print("this is saturday")
+elif today == "sunday":
+   print("this is sunday")
+else:
+   print("something else")
+\end{lstlisting}
+
+我们可以根据实际需求，添加对应的多个elif条件。
+
+\subsection{分支嵌套}
+我们可以在if声明语句块中嵌套使用if声明。例如：
+
+\begin{lstlisting}
+today = "holiday"
+bank_balance = 25000
+if today == "holiday":
+    if bank_balance > 20000:
+        print("Go for shopping")
+    else:
+        print("Watch TV")
+else:
+    print("normal working day")
+\end{lstlisting}

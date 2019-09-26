@@ -1,0 +1,168 @@
+\section{列表}
+
+Python的列表（list）对象是最常用的序列(Sequence)。与字符串是不可变序列不同，列表是可变的。可通过对偏移量进行修改和读取。
+
+\subsection{列表赋值}
+
+列表可通过索引对其对应的元素进行赋值，从而改变列表的内容，如：
+
+\begin{lstlisting}
+>>> a = [2, 2, 2]
+>>> a[1] = 1
+>>> print(a)
+[2, 1, 2]
+\end{lstlisting}
+
+通过上述代码的运行，我们可以看到列表确实是可以改变的。
+
+\subsection{删除元素}
+
+使用del语句可以删除列表中的元素，如：
+
+\begin{lstlisting}
+>>> a = [2, 2, 2]
+>>> del a[1]
+>>> print(a)
+[2, 2]
+\end{lstlisting}
+
+\subsection{分片赋值}
+
+分片赋值可以一次为多个元素赋值，并且不用考虑原列表的长度是否和新的列表长度一直，如：
+
+\begin{lstlisting}
+>>> name = list('Python')
+>>> print(name)
+['P', 'y', 't', 'h', 'o', 'n']
+>>> name[2:] = list('data')
+>>> print(name)
+['P', 'y', 'd', 'a', 't', 'a']
+\end{lstlisting}
+
+上述代码中的list函数是Python内置函数，其作用是将字符串转换为列表。
+运行结果显示，通过分片赋值，将原有列表['P', 'y', 't', 'h', 'o', 'n']，修改为['P', 'y', 'd', 'a', 't', 'a']。
+
+分片赋值还可以用来插入元素，如：
+
+\begin{lstlisting}
+>>> name = list('Python')
+>>> name[1:1] = list('--')
+>>> print(name)
+['P', '-', '-', 'y', 't', 'h', 'o', 'n']
+\end{lstlisting}
+结果显示将原有列表['P', 'y', 't', 'h', 'o', 'n']，修改为['P', '-', '-', 'y', 'd', 'a', 't', 'a']。
+
+\subsection{列表对象常用内置方法}
+
+\subsubsection{追加列表元素}
+。列表提供了在列表尾部追加新对象的方法append。
+
+\begin{lstlisting}
+>>> code = [1, 2, 3]
+>>> code.append(4)
+>>> print(code)
+[1, 2, 3, 4]
+\end{lstlisting}
+
+\subsubsection{计数}
+
+count方法统计指定元素在列表中出现的次数，如：
+
+\begin{lstlisting}
+>>> code = ['to', 'be', 'or', 'not', 'to', 'be']
+>>> print(code.count('to'))
+2
+\end{lstlisting}
+
+以上代码将统计出列表中‘to’元素出现的次数，结果为2。
+
+\subsubsection{合并列表}
+
+extend方法在列表的末尾一次性追加另一个序列中的多个值，如：
+
+\begin{lstlisting}
+a = [1, 2, 3]
+b = [4, 5, 6]
+a.extend(b)
+print(a)
+\end{lstlisting}
+
+以上代码将把b列表追加到a列表中，打印出的a列表的值为[1, 2, 3, 4, 5, 6]。和序列加运算不同，extend方法将改变原有列表的内容，而加运算却不会。例如：
+
+\begin{lstlisting}
+b = [4, 5, 6]
+b + [7, 8, 9]
+print(b)
+\end{lstlisting}
+
+上述代码结果显示为[4, 5, 6]，b列表的内容并没有改变。
+
+\subsubsection{元素索引}
+
+index方法用于从列表中找出指定值第一次匹配的索引值。例如：
+
+\begin{lstlisting}
+a = [1, 2, 3, 3, 2, 1]
+print(a.index(1))
+\end{lstlisting}
+
+以上代码运行结果为0，即第一个1出现的索引为0。
+
+\subsubsection{插入元素}
+
+insert方法用于将对象插入到列表中，例如：
+
+\begin{lstlisting}
+a = [1, 2, 3]
+a.insert(2, 2.5)
+print(a)
+\end{lstlisting}
+
+运行结果为[1, 2, 2.5, 3]，insert方法的两个参数值很好理解，第一个参数为在哪个元素后插入，表示位置，第二个参数为插入的内容。
+
+\subsubsection{pop}
+
+pop方法会移除列表中的一个元素，默认为最后一个，和append方法刚好相反，并且返回该元素的值。例如：
+
+\begin{lstlisting}
+a = [1, 2, 3]
+print(a.pop())
+print(a)
+\end{lstlisting}
+
+运行结果为3和[1, 2]，当然，pop方法也可以指定移除某个索引的元素。
+
+\subsubsection{remove}
+
+remove方法用于移除列表中某个值的第一个匹配项：
+
+\begin{lstlisting}
+code = ['to', 'be', 'or', 'not', 'to', 'be']
+print(code.remove('or'))
+print(code)
+\end{lstlisting}
+
+运行结果为None和['to', 'be', 'not', 'to', 'be']。这说明remove方法并不返回匹配到的内容。
+
+\subsubsection{reverse}
+
+reverse方法将倒序排列列表元素：
+
+\begin{lstlisting}
+a = [1, 2, 3]
+a.reverse()
+print(a)
+\end{lstlisting}
+
+运行结果为[3, 2, 1]。
+
+\subsubsection{sort}
+sort方法用于对列表排序，如：
+
+\begin{lstlisting}
+a = [1, 3, 4, 8, 6, 2]
+a.sort()
+print(a)
+\end{lstlisting}
+
+运行结果为：[1, 2, 3, 4, 6, 8]。需要注意的是，sort方法没有返回值，并且改变列表的内容，如果你不但要排序，而且还要保持原有数据的内容，解决的方法之一是将原有内容赋值到另外一个变量中保存。

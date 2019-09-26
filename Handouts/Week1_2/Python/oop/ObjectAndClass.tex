@@ -1,0 +1,104 @@
+\section{Python对象和类}
+
+\subsection{创建类}
+Python一门面向对象的语言。在Python中所有的东西都是对象，比如之前学习的整型、字符串等等，甚至模块、函数也都是对象。
+
+面向对象编程时使用对象创建程序，使用对象存储数据和行为。
+
+在Python中，使用关键字class定义类。类通常包括数据区域，用以存数数据和方法的定义。Python中的所有类，都包含一个特殊的方法，叫作初始化（initializer），或者叫作构造方法。构造方法会在使用类创建新的对象时自动执行。例如：
+
+\begin{lstlisting}
+class Person:
+
+      # 构造函数
+      def __init__(self, name):
+            self.name = name
+
+      # 定义方法
+     def whoami(self):
+           return "You are " + self.name
+\end{lstlisting}
+
+上述代码中，我们创建了一个名叫Person的类，这个类中包含数据字段name和方法whoami()。
+\begin{myremark}{What is self ??}
+Python中的所有方法，包括构造方法，首个参数都是self。这个参数指向对象本身。当我们创建一个新的对象时候，self参数就会自动指向新创建的对象。
+\end{myremark}
+
+\subsection{从类中创建对象}
+使用类名就可创建对象。当我们调用方法时，不需要传递self参数，Python会自动传递。例如：
+\begin{lstlisting}
+p1 = Person('tom')
+print(p1.whoami())
+print(p1.name)
+\end{lstlisting}
+
+输出结果为：
+
+\begin{lstlisting}
+You are tom
+tom
+\end{lstlisting}
+
+我们还可以改变数据字段的值：
+
+\begin{lstlisting}
+p1.name = 'jerry'
+print(p1.name)
+\end{lstlisting}
+
+输出结果为jerry。然而，像这样从类的外部获取数据字段，属于不太好的操作方式，下面我们看如何阻止这种操作。
+
+\subsection{隐藏数据字段}
+为了隐藏数据字段，我们需要定义私有数据字段。在Python中，使用两个前置下划线，就可定义私有数据字段和私有方法。比如：
+
+\begin{lstlisting}
+class BankAccount:
+
+     # 构造函数
+    def __init__(self, name, money):
+        self.__name = name  # 定义私有数据字段
+        self.__balance = money  # 定义私有数据字段
+
+    def deposit(self, money):
+        self.__balance += money
+
+    def withdraw(self, money):
+        if self.__balance > money:
+            self.__balance -= money
+            return money
+        else:
+            return "Insufficient funds"
+
+    def checkbalance(self):
+        return self.__balance
+
+b1 = BankAccount('tim', 400)
+print(b1.withdraw(500))
+b1.deposit(500)
+print(b1.checkbalance())
+print(b1.withdraw(800))
+print(b1.checkbalance())
+\end{lstlisting}
+
+在上述代码中，我们定义了BankAccout类，这个类有两个数据字段，但都是私有字段。代码运行结果为：
+
+\begin{lstlisting}
+Insufficient funds
+900
+800
+100
+\end{lstlisting}
+
+现在，让我们尝试访问私有数据字段：
+
+\begin{lstlisting}
+print(b1.__balance)
+\end{lstlisting}
+
+结果显示：
+
+\begin{lstlisting}
+AttributeError: 'BankAccount' object has no attribute '__balance'
+\end{lstlisting}
+
+这就表明，设置为私有的数据字段，无法在类的外部访问。

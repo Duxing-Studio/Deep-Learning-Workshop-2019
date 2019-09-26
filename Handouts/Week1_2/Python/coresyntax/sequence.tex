@@ -1,0 +1,98 @@
+\section{序列}
+
+序列（Sequence）是一个包含其他对象的有序集合，序列中的元素包含了一个从左到右的顺序，可以根据元素所在的位置进行存储和读取。Python中内建了6种序列，分别是列表、元组、字符串、unicode字符串、buffer对象和xrange对象。
+
+序列作为Python的数据结构，有一些操作是通用的，如：索引、分片、加、乘以及检查某个成员是否属于序列的成员（成员资格），另外，还有一些计算长度、找到最大元素等等的内建函数。
+
+\subsection{索引}
+
+序列中的所有元素都有编号，从0开始，可以按照编号来访问序列中的元素，这个标号就是索引(indexing)。
+
+\begin{lstlisting}
+se = 'Hello'
+print(se[0])
+print(se[-1])
+\end{lstlisting}
+
+se[0]表示序列se中的第一个元素，se[-1]表示序列中的最后一个元素。
+
+\subsection{分片}
+
+分片（Slicing）操作指的是访问序列中一定范围之内的元素。分片通过冒号相隔的两个索引来实现，第一个索引是需要提取部分的第1个元素的编号，而第二个索引是分片之后剩下部分的第1个元素的编号，第二个索引不包含在分片之中：
+
+\begin{lstlisting}
+se = 'Hello Pythoner！'
+print(se[0:5])
+\end{lstlisting}
+
+上述代码将打印出‘Hello’字符串。但有时，我们需要获取序列的后面几个元素，同时，序列的大小是未知的，我们可以这样写：
+
+\begin{lstlisting}
+se = 'Hello Pythoner！'
+print(se[-9:])
+\end{lstlisting}
+
+se[-9:]中空了第2个索引，表示一直到最后一个元素。上述代码将打印出‘Pythoner！’字符串。
+
+进行分片时，分片的开始和结束点需要指定。而另外一个参数步长（step length）通常默认为1，当有必要时，可是指定切片的步长，如每隔1个元素就取出元素：
+
+\begin{lstlisting}
+numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+print(numbers[0:10:2])
+print(numbers[1::2])
+\end{lstlisting}
+
+上述代码将打印出‘[1, 3, 5, 7, 9]’和‘[2, 4, 6, 8, 10]’，其中的步长都是2。
+当然步长也可以设置为负值，这样分片会从后往前进行。
+
+\subsection{序列相加}
+可以通过加号能对两个相同类型的序列进行连接运算，如字符串：
+
+\begin{lstlisting}
+hello = '你好'
+name = 'yangjh'
+print(hello + name)
+\end{lstlisting}
+
+上述代码将打印出‘你好yangjh’字符串。
+
+\subsection{序列相乘}
+序列乘以数字，表示将原有序列重复若干次：
+
+\begin{lstlisting}
+hello = '你好'
+print(hello * 3)
+\end{lstlisting}
+
+上述代码将打印出‘你好你好你好’字符串。
+
+空列表可以使用‘[]’来表示，但是，如果想创建有10个空元素组成的列表，就需要使用None，None是Python内建的一个值，表示什么都没有，因此，要创建含有10个空元素的列表，就可以这样：
+
+\begin{lstlisting}
+print([None] * 10)
+\end{lstlisting}
+
+\subsection{成员资格}
+使用in运算符，可以检查某个元素是否存在与指定的序列中。如果元素存在于序列中，则返回True，否则返回False。
+
+\begin{lstlisting}
+print('张三' in ['张三', '李四', '王二'])
+\end{lstlisting}
+
+上述代码将打印出布尔值True。
+
+\subsection{长度、最小值、最大值}
+
+\begin{myremark}{使用dir()函数输出对象的内置方法}
+dir()函数可以输出对象的内置方法。如：dir('str')就可以打印出所有字符串对象的内置方法。
+\end{myremark}
+
+内建函数len()可以返回序列的大小，如：
+
+\begin{lstlisting}
+numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+print(len(numbers))
+print(max(numbers))
+print(min(numbers))
+\end{lstlisting}
+上述代码将打印出numbers序列的长度‘10’和最大值以及最小值。
