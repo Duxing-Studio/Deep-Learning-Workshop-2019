@@ -1,0 +1,292 @@
+
+\section{Generalization power}\label{sec:generalization}
+
+Section~\ref{sec:opt} has focused on the in-sample$\,$/$\,$ training
+error obtained via SGD, but this alone does not guarantee good performance with respect to the
+out-of-sample$\,$/$\,$test error. The gap between the in-sample
+error and the out-of-sample error, namely the \emph{generalization
+gap}, has been the focus of statistical learning theory since its
+birth; see \cite{shalev2014understanding} for an excellent introduction
+to this topic.
+
+%Understanding the generalization power of deep neural nets is a major open problem. This problem is further complicated by the fact that the capacity of (unrestricted) deep neural networks is large enough for them to memorize$\,$/$\,$overfit the training data~\citep{zhang2016understanding}. In this section, we survey recent attempts towards understanding the generalization power of deep learning. From a high level point of view, these approaches can be divided into two categories, namely \emph{algorithm-independent controls }and \emph{algorithm-dependent control}s. More specifically, algorithm-independent controls focus solely on bounding the \emph{complexity }of the function class represented by certain deep neural networks. In contrast, algorithm-dependent controls take into account the algorithm (e.g., SGD) used to train the neural network.
+
+While understanding the generalization power of deep neural nets is difficult~\cite{zhang2016understanding,recht2018cifar}, we sample recent endeavors in this section. From a high level point of
+view, these approaches can be divided into two categories, namely \emph{algorithm-independent controls }and \emph{algorithm-dependent
+control}s. More specifically, algorithm-independent controls focus
+solely on bounding the \emph{complexity }of the function class represented
+by certain deep neural networks. In contrast, algorithm-dependent
+controls take into account the algorithm (e.g., SGD) used
+to train the neural network.
+
+
+\subsection{Algorithm-independent controls: uniform convergence}
+
+The key to algorithm-independent controls is the notion of \emph{complexity
+}of the function class parametrized by certain neural networks. Informally,
+as long as the complexity is not too large, the generalization gap
+of \emph{any} function in the function class is well-controlled. However,
+the standard complexity measure (e.g., VC dimension \citep{vapnik1971uniform})
+is at least proportional to the number of weights
+in a neural network \citep{anthony2009neural, shalev2014understanding}, which fails to
+explain the practical success of deep learning. The caveat here is
+that the function class under consideration is \emph{all} the functions realized
+by certain neural networks, with \emph{no} restrictions on the size
+of the weights at all. On the other hand, for the class of linear
+functions with bounded norm, i.e., $\{\bm{x}\mapsto\bm{w}^{\top}\bm{x}\,|\,\|\bm{w}\|_{2}\leq M\}$,
+it is well understood that the complexity of
+this function class (measured in terms of the empirical Rademacher complexity) with respect to a random sample $\{\bm{x}_{i}\}_{1 \leq i \leq n}$
+is upper bounded by $\max_{i}\|\bm{x}_{i}\|_{2}M/\sqrt{n}$, which
+is independent of the number of parameters in $\bm{w}$. This motivates
+researchers to investigate the complexity of \emph{norm-controlled}
+deep neural networks\footnote{Such attempts have been made in the seminal work~\cite{bartlett1998sample}.} \citep{neyshabur2015norm,NIPS2017_7204,golowich2017size,li2018tighter}.
+Setting the stage, we introduce a few necessary notations and facts.
+The key object under study is the function class parametrized by the
+following fully-connected neural network with depth~$L$:
+\begin{equation}
+\mathcal{F}_{L}\triangleq\left\{ \bm{x}\mapsto\bm{W}_{L}\bsigma\left(\bm{W}_{L-1}\bsigma\left(\cdots\bm{W}_{2}\bsigma\left(\bm{W}_{1}\bm{x}\right)\right)\right)\,\big|\,\left(\bm{W}_{1},\cdots,\bm{W}_{L}\right)\in\mathcal{W}\right\}.\label{eq:function-class-ffn}
+\end{equation}
+Here $(\bm{W}_{1},\bm{W}_{2},\cdots,\bm{W}_{L})\in\mathcal{W}$
+represents a certain constraint on the parameters. For instance, one
+can restrict the Frobenius norm of each parameter $\bm{W}_{l}$ through
+the constraint $\|\bm{W}_{l}\|_{\mathrm{F}}\leq M_{\mathrm{F}}(l)$,
+where $M_{\mathrm{F}}(l)$ is some positive quantity. With regard
+to the complexity measure, it is standard to use \emph{Rademacher
+complexity} to control the capacity of the function class of interest.
+
+\begin{definition}[Empirical Rademacher complexity] The empirical
+Rademacher complexity of a function class~$\mathcal{F}$ w.r.t.~a dataset $S\triangleq\{\bm{x}_{i}\}_{1 \leq i \leq n}$  is
+defined as
+\begin{equation}
+\mathcal{R}_{S}\left(\mathcal{F}\right)=\mathbb{E}_{\bm{\varepsilon}}\Big[\sup_{f\in\mathcal{F}}\frac{1}{n}\sum_{i=1}^{n}\varepsilon_{i}f\left(\bm{x}_{i}\right)\Big],\label{eq:empirical-rademacher-complexity}
+\end{equation}
+where $\bm{\varepsilon}\triangleq(\varepsilon_{1},\varepsilon_{2},\cdots,\varepsilon_{n})$
+is composed of i.i.d.~Rademacher random variables, i.e., $\mathbb{P}(\varepsilon_{i}=1)=\mathbb{P}(\varepsilon_{i}=-1)=1/2$.
+\end{definition}
+
+In words, Rademacher complexity measures
+the ability of the function class to fit the random noise represented
+by $\bm{\varepsilon}$. Intuitively, a function class with a larger Rademacher
+complexity is more prone to overfitting. We now formalize the connection between the empirical Rademacher complexity
+and the out-of-sample error; see Chapter 24 in~\cite{shalev2014understanding}.
+
+\begin{thm}Assume that for all $f\in\mathcal{F}$
+and all $(y,\bm{x})$ we have $|\mathcal{L}(f(\bm{x}),y)|\leq1$.
+In addition, assume that for any fixed $y$, the univariate function $\mathcal{L}(\cdot,y)$ 
+is Lipschitz with constant 1. Then with probability at least $1-\delta$ over the sample $S\triangleq\{(y_{i},\bm{x}_{i})\}_{1\leq i\leq n}\overset{\mathrm{i.i.d.}}{\sim}\mathcal{D}$, one has for all $f\in\mathcal{F}$
+\[
+\underbrace{\vphantom{\frac{1}{n}\sum_{i=1}^{n}}\mathbb{E}_{(y,\bm{x})\sim \mathcal{D}}\left[\mathcal{L}\left(f(\bm{x}), y\right)\right]}_{\mathrm{out}\text{-}\mathrm{of}\text{-}\mathrm{sample\;error}}\leq\underbrace{\frac{1}{n}\sum_{i=1}^{n}\mathcal{L}\left(f(\bm{x}_{i}),y_{i}\right)}_{\mathrm{in}\text{-}\mathrm{sample\;error}}+2\mathcal{R}_{S}\left(\mathcal{F}\right)+4\sqrt{\frac{\log\left(4/\delta\right)}{n}}.
+\]
+\end{thm}
+%The intuition can indeed
+%be made precise; see \citep[Chapter 26]{shalev2014understanding} for
+%a formal statement about the relationship between Rademacher complexity
+%and the generalization error.
+In English, the generalization gap of any function $f$ that lies in $\mathcal{F}$ is well-controlled as long as the Rademacher complexity of $\mathcal{F}$ is not too large. With this connection in place, we single out the
+following complexity bound.
+
+\begin{thm}[Theorem 1 in~\citep{golowich2017size}]Consider the
+function class $\mathcal{F}_{L}$ in~(\ref{eq:function-class-ffn}),
+where each parameter $\bm{W}_{l}$ has Frobenius norm at most $M_{\mathrm{F}}(l)$.
+Further suppose that the element-wise activation function $\sigma(\cdot)$
+is $1$-Lipschitz and positive-homogeneous (i.e., $\sigma(c\cdot x)=c\sigma(x)$
+for all $c\geq0$). Then the empirical Rademacher complexity~(\ref{eq:empirical-rademacher-complexity})
+w.r.t. $S\triangleq\{\bm{x}_{i}\}_{1 \leq i \leq n}$ satisfies
+\begin{equation}
+\mathcal{R}_{S}\left(\mathcal{F}_{L}\right)\leq\max_{i}\|\bm{x}_{i}\|_{2}\cdot\frac{4\sqrt{L}\prod_{l=1}^{L}M_{\mathrm{F}}(l)}{\sqrt{n}}.\label{eq:rademacher-nn}
+\end{equation}
+\end{thm}The upper bound of the empirical Rademacher complexity
+(\ref{eq:rademacher-nn}) is in a similar vein to that of linear functions
+with bounded norm, i.e., $\max_{i}\|\bm{x}_{i}\|_{2}M/\sqrt{n}$,
+where $\sqrt{L}\prod_{l=1}^{L}M_{\mathrm{F}}(l)$ plays the role of
+$M$ in the latter case. Moreover, ignoring the term $\sqrt{L}$,
+the upper bound (\ref{eq:rademacher-nn}) does not depend on the size
+of the network in an explicit way  if $M_F(l)$ sharply concentrates around $1$. This reveals that the capacity
+of the neural network is well-controlled, regardless of the number
+of parameters, as long as the Frobenius norm of the parameters is
+bounded. Extensions to other norm constraints, e.g., spectral norm
+constraints, path norm constraints have been considered by \cite{neyshabur2015norm,NIPS2017_7204,li2018tighter,klusowski2016risk, E19}.
+This line of work improves upon traditional capacity analysis of neural
+networks in the over-parametrized setting, because the upper bounds derived are often size-independent.
+Having said this, two important remarks are in order: (1) the upper bounds (e.g., $\prod_{l=1}^{L}M_{\mathrm{F}}(l)$)
+involve implicit dependence on the size of the weight matrix and
+the depth of the neural network, which is hard to characterize; (2) the upper bound on the Rademacher complexity offers a uniform bound
+over all functions in the function class, which is a pure statistical
+result. However, it stays silent about how and why standard training
+algorithms like SGD can obtain a function whose parameters have small
+norms.
+
+\subsection{Algorithm-dependent controls}
+
+In this subsection, we bring computational thinking into statistics and investigate the role of algorithms in the generalization power of deep learning. The consideration of algorithms is quite natural and well motivated: (1) local/global minima reached by different algorithms can exhibit totally different generalization behaviors due to extreme nonconvexity, which marks a huge difference from traditional models, (2) the \emph{effective }capacity of neural nets is possibly not large, since a particular algorithm does not explore the entire parameter space.
+
+These demonstrate the fact that on top of the complexity of the function class,
+the inherent property of the algorithm we use plays an important role in the generalization ability of deep learning. In what follows, we survey three different ways to obtain upper bounds on the generalization errors by exploiting properties of the algorithms.
+\subsubsection{Mean field view of neural nets} As we have emphasized, modern deep learning models are highly over-parametrized. %, i.e., the number of parameters is much larger than the number of inputs$\,$/$\,$input dimensions.
+A line of work~\citep{mei2018mean,sirignano2018mean,rotskoff2018neural,chizat2018global,mei2019mean,javanmard2019analysis}
+%investigates the asymptotic regime where the number of weights is infinite and tries to approximate the dynamics of SGD using solutions to certain partial different equations.
+approximates the ensemble of weights by an asymptotic limit as the number of hidden units tends to infinity, so that the dynamics of SGD can be studied via certain partial different equations.
+
+More specifically, let $\hat f(\xx; \btheta) = N^{-1} \sum_{i=1}^N \sigma(\btheta_i^\top \xx)$ be a function given by a one-hidden-layer neural net with $N$ hidden units, where $\sigma(\cdot)$ is the ReLU activation function and parameters $\btheta \triangleq [\btheta_1,\ldots,\btheta_N]^\top \in \R^{N \times d}$ are suitably randomly initialized. Consider the regression setting where we want to minimize the population risk $R_N(\btheta) =  \E[(y - \hat f(\xx; \btheta))^2]$ over parameters $\btheta$. A key observation is that this population risk depends on the parameters $\btheta$ only through its empirical distribution, i.e., $\hat \rho^{(N)} = N^{-1} \sum_{i=1}^N \delta_{\btheta_i}$ where $\delta_{\btheta_i}$ is a point mass at $\btheta_i$. This motivates us to view express $R_N(\btheta)$ equivalently as $R(\hat \rho^{(N)})$, where $R(\cdot)$ is a functional that maps distributions to real numbers. Running SGD for $R_N(\cdot)$---in a suitable scaling limit---results in a gradient flow on the space of distributions endowed with the Wasserstein metric that minimizes $R(\cdot)$. It turns out that the  empirical distribution $\hat \rho^{(N)}_k$ of the parameters after $k$ steps of SGD is well approximated by the gradient follow, as long as the the neural net is over-parametrized (i.e., $N\gg d$) and the number of steps is not too large. In particular, \cite{mei2018mean} have shown that under certain regularity conditions,
+\[
+\sup_{k\in[0,T/\varepsilon]\cap\mathbb{N}}\left| R(\hat \rho^{(N)})-R\left(\rho_{k\varepsilon}\right)\right|\lesssim e^{T}\sqrt{\frac{1}{N}\vee\varepsilon}\cdot\sqrt{d+\log\frac{N}{\varepsilon}},
+\]
+where $\varepsilon >0$ is an proxy for the step size of SGD and $\rho_{k\varepsilon}$ is the distribution of the gradient flow at time $k\varepsilon$.  In words, the out-of-sample error under $\btheta^{k}$ generated by SGD is well-approximated by that of $\rho_{k\varepsilon}$.
+Viewing the optimization problem from the distributional aspect greatly simplifies the problem conceptually, as the complicated optimization problem is now passed into its limit version---for this reason, this analytical approach is called the mean field perspective. In particular, \cite{mei2018mean} further demonstrated that in some simple settings, the out-of-sample error $R(\rho_{k\varepsilon})$ of the distributional limit can be fully characterized. Nevertheless, how well does $R(\rho_{k\varepsilon})$ perform and how fast it converges remain largely open for general problems.
+
+%Traditional wisdom may warn us against over-parametrized models, due to the potential risk of inflated generalization errors. However, at least for one-hidden-layer neural nets, it has been shown that SGD can steer away from this danger .
+
+%The key insight is that, if we view $R_N$ as a function with respect to the parameter distribution (not parameters), then $R_N$ is a convex function; moreover,   \citep{mei2018mean} has established rigorous results, which show that increasing $N$ after reaching some threshold $N_0$ essentially does not inflate the excess risk $R_N(\btheta^k) - \inf_{\btheta} R_N(\btheta)$, where $\btheta^k$ is the parameters after $k$ SGD iterations.
+
+
+\subsubsection{Stability} A second way to understand the generalization ability of deep learning is through the \emph{stability} of SGD. An algorithm is considered
+stable if a slight change of the input does not alter the output much. It has long been observed that a stable algorithm has a small generalization gap; examples include $k$ nearest neighbors~\citep{rogers1978finite, devroye1979distribution}, bagging~\citep{breiman1996bagging, breiman1996heuristics}, etc. The precise connection between stability and generalization gap is stated by~\cite{bousquet2002stability, shalev2010learnability}. In what follows, we formalize the idea of \emph{stability} and its connection with the generalization
+gap. Let $\mathcal{A}$ denote an algorithm (possibly randomized) which takes a sample $S\triangleq\{(y_{i},\bm{x}_{i})\}_{1 \leq i \leq n}$
+of size $n$ and returns an estimated parameter $\hat{\bm{\theta}}\triangleq\mathcal{A}(S)$.
+Following \cite{hardt2015train}, we have the following definition
+for \emph{stability}.
+
+\begin{definition}An algorithm (possibly randomized) $\mathcal{A}$
+is $\varepsilon$-uniformly stable with respect to the loss function
+$\mathcal{L}(\cdot,\cdot)$ if for all datasets $S,S'$ of size $n$ which differ
+in at most one example, one has 
+\[
+\sup_{\bm{x},y}\mathbb{E}_{\mathcal{A}}\left[\mathcal{L}\left(f(\bm{x};\mathcal{A}\left(S\right)),y\right)-\mathcal{L}\left(f(\bm{x}; \mathcal{A}\left(S'\right)),y\right)\right]\leq\varepsilon.
+\]
+Here the expectation is taken w.r.t.~the randomness in the algorithm
+$\mathcal{A}$ and $\varepsilon$ might depend on $n$. The loss function $\mathcal{L}(\cdot,\cdot)$ takes an example (say $(\bm{x},y)$) and the estimated
+parameter (say $\mathcal{A}(S)$) as inputs and outputs a real value. \end{definition}
+
+Surprisingly, an $\varepsilon$-uniformly stable algorithm incurs
+small generalization gap \emph{in expectation}, which is stated in the following
+lemma.
+\begin{lem}[Theorem 2.2 in \citealp{hardt2015train}]\label{lemma:stability-generalization}Let
+$\mathcal{A}$ be $\varepsilon$-uniformly stable. Then the expected
+generalization gap is no larger than $\varepsilon$, i.e.,
+\begin{equation}
+\left|\mathbb{E}_{\mathcal{A},S}\left[\frac{1}{n}\sum_{i=1}^{n}\mathcal{L}(f(\bm{x}_{i};\mathcal{A}\left(S\right)),y_{i})-\mathbb{E}_{(\bm{x},y)\sim\mathcal{D}}\left[\mathcal{L}\left(f(\bm{x};\mathcal{A}\left(S\right)),y\right)\right]\right]\right|\leq\varepsilon.\label{eq:stability-generalization-gap}
+\end{equation}
+\end{lem}
+
+%As a side note, the message conveyed in Lemma~\ref{lemma:stability-generalization} is very similar to that of Stein's unbiased risk estimator~\citep{stein1981estimation}. In the latter case, the gap between the population risk and the empirical risk of a mean estimator is exactly quantified by the sensitivity of the estimator to the training data.
+With Lemma~\ref{lemma:stability-generalization} in hand, it suffices to prove stability bound on specific
+algorithms. It turns out that SGD introduced
+in Section~\ref{sec:opt} is uniformly stable when solving smooth
+nonconvex functions.
+
+\begin{thm}[Theorem 3.12 in~\cite{hardt2015train}]\label{thm:sgd-stability}Assume
+that for any fixed $(y, \bm{x})$, the loss function $\mathcal{L}(f(x;\btheta), y)$, viewed as a function of $\btheta$,
+is $L$-Lipschitz and $\beta$-smooth. Consider running SGD on the
+empirical loss function with decaying step size $\alpha_{t}\leq c/t$,
+where $c$ is some small absolute constant. Then SGD is uniformly
+stable with
+\[
+\varepsilon\lesssim\frac{T^{1-\frac{1}{\beta c+1}}}{n},
+\]
+where we have ignored the dependency on $\beta,c$ and $L$. \end{thm}Theorem~\ref{thm:sgd-stability}
+reveals that SGD operating on nonconvex loss functions is indeed uniformly
+stable as long as the number of steps $T$ is not large compared with
+$n$. This together with Lemma~\ref{lemma:stability-generalization}
+demonstrates the generalization ability of SGD in expectation. %In addition, benefits of various optimization tricks including weight decay and  dropout can be understood through the lens of stability; see~\cite[Section 4]{hardt2015train} for details.
+Nevertheless, two important limitations are worth mentioning.  First, Lemma~\ref{lemma:stability-generalization} provides an upper bound on the out-of-sample error \emph{in expectation}, but ideally, instead of an on-average guarantee under $\mathbb{E}_{\mathcal{A},S}$, we would like to have a high probability guarantee as in the convex case~\citep{feldman2019high}.
+%. However, it does not reveal any information on its tail behavior. Constructing high probability bounds over the randomness of the data and the algorithm seems necessary to prove the benefits of stability. Such an effort has been made in the case with convex loss functions and deterministic algorithms~\citep{feldman2019high}.
+Second, controlling the generalization gap alone is not enough to achieve a small out-of-sample error, since it is unclear whether SGD can achieve a small training error within $T$ steps.
+%Second, controlling the generalization gap alone as in Lemma~\ref{lemma:stability-generalization} is not enough to achieve a small out-of-sample error; it remains unclear whether SGD can achieve a small training error in $T$ steps where the stability upper bound (cf.~Theorem~\ref{thm:sgd-stability}) does not blow up.
+
+
+\subsubsection{Implicit regularization} %As we alluded to earlier, modern deep neural networks have more parameters (say $10^{9}$) than the number of samples (say $10^{6}$). Conventional wisdom informs us that one should apply some regularization techniques (e.g., weight decay) so that the model will not overfit the data. In practice, however, neural networks without explicit regularization generalize well. This phenomenon motivates researchers to look at the regularization effects introduced by training algorithms (e.g., stochastic gradient descent) in this over-parametrized regime, where there might exits multiple, if not infinite global minima of the empirical loss~(\ref{eq:ERM_for_DL}).  The hope is that different algorithmsbias us towards different solutions, with possibly different generalization powers.
+
+In the presence of over-parametrization (number of parameters larger than the sample size), conventional wisdom informs us that we should apply some regularization techniques (e.g., $\ell_1\,/\, \ell_2$ regularization) so that the model will not overfit the data. However, in practice, neural networks without explicit regularization generalize well. This phenomenon motivates researchers to look at the regularization effects introduced by training algorithms (e.g., SGD) in this over-parametrized regime. While there might exits multiple, if not infinite global minima of the empirical loss~(\ref{eq:ERM_for_DL}), it is possible that practical algorithms tend to converge to solutions with better generalization powers.
+
+Take the underdetermined linear system $\bm{X}\bm{\theta}=\bm{y}$
+as a starting point. Here $\bm{X}\in\mathbb{R}^{n\times p}$ and $\bm{\theta}\in\mathbb{R}^{p}$
+with $p$ much larger than $n$. Running gradient descent on the loss
+$\frac{1}{2}\|\bm{X}\bm{\theta}-\bm{y}\|_{2}^{2}$ from the origin
+(i.e., $\bm{\theta}^{0}=\bm{0}$) results in the solution with the minimum Euclidean
+norm, that is GD converges to
+\begin{align*}
+\min_{\bm{\theta}\in\mathbb{R}^{p}} & \quad\|\bm{\theta}\|_{2}\qquad\text{subject to}\quad\bm{X}\bm{\theta}=\bm{y}.
+\end{align*}
+In words, without any $\ell_{2}$ regularization in the loss function,
+gradient descent automatically finds the solution with the least $\ell_{2}$ norm.
+This phenomenon, often called as \emph{implicit regularization}, not
+only has been empirically observed in training neural networks, but
+also has been theoretically understood in some simplified cases, e.g., logistic regression with separable data.
+In logistic regression, given a training
+set $\{(y_{i},\bm{x}_{i})\}_{1\leq i \leq n}$ with $\bm{x}_{i}\in\mathbb{R}^{p}$
+and $y_{i}\in\{1,-1\}$, one aims to fit a logistic regression model
+by solving the following program:
+\begin{equation}
+\min_{\bm{\theta}\in\mathbb{R}^{p}}\qquad\frac{1}{n}\sum_{i=1}^{n}\ell\big(y_{i}\bm{x}_{i}^\top \bm{\theta}^{t}\big).\label{eq:loss-logistic}
+\end{equation}
+Here, $\ell(u)\triangleq\log(1+e^{-u})$ denotes the logistic loss. Further
+assume that the data is separable, i.e., there exists $\bm{\theta}^{*}\in\mathbb{R}^{p}$
+such that $y_{i}\bm{\theta}^{*\top}\bm{x}_{i}>0$ for all $i$. Under this condition,
+%the loss function (\ref{eq:loss-logistic}) has a minimal value of
+%zero, however, this cannot be attained by any finite $\bm{\theta}$.
+the loss function (\ref{eq:loss-logistic}) can be arbitrarily close to zero for certain $\btheta$ with $\| \btheta \|_2 \to \infty$.
+What happens when we minimize (\ref{eq:loss-logistic}) using gradient
+descent? \cite{soudry2018implicit} uncovers a striking phenomenon.
+
+\begin{thm}[Theorem 3 in \citealp{soudry2018implicit}]Consider
+the logistic regression (\ref{eq:loss-logistic}) with separable data.
+If we run GD
+\[
+\bm{\theta}^{t+1}=\bm{\theta}^{t}-\eta\frac{1}{n}\sum_{i=1}^{n}y_{i}\bm{x}_{i}\ell'\big(y_{i}\bm{x}_{i}^\top \bm{\theta}^{t}\big)
+\]
+from any initialization $\bm{\theta}^{0}$ with appropriate step size
+$\eta>0$, %then $\bm{\theta}^{t}$ converges in direction to the $\ell_{2}$
+%max margin vector. That is
+then normalized $\bm{\theta}^{t}$ converges to a solution with the maximum $\ell_2$ margin. That is,
+\begin{equation}
+\lim_{t\to\infty}\frac{\bm{\theta}^{t}}{\|\bm{\theta}^{t}\|_{2}}=\hat{\bm{\theta}},\label{eq:converge-in-direction}
+\end{equation}
+where $\hat{\bm{\theta}}$ is the solution to the hard margin support
+vector machine: % (SVM):
+\begin{equation}
+\hat{\bm{\theta}}\triangleq\arg\min_{\bm{\theta}\in\mathbb{R}^{p}}\|\bm{\theta}\|_{2},\qquad\text{subject to}\quad y_{i}\bm{x}_{i}^\top \bm{\theta} \geq1\quad\text{for all }1\leq i\leq n.\label{eq:SVM}
+\end{equation}
+\end{thm}
+
+The above theorem reveals that gradient descent, when solving logistic
+regression with separable data, implicitly regularizes the iterates towards
+the $\ell_{2}$ max margin vector (cf.~(\ref{eq:converge-in-direction})),
+without any explicit regularization as in (\ref{eq:SVM}). Similar
+results have been obtained by \cite{ji2018risk}. In addition, \cite{gunasekar2018characterizing}
+%demonstrates other implicit biases brought by optimization algorithms
+%other than gradient descent (e.g., mirror descent, coordinate descent).
+%For instance, \cite{gunasekar2018characterizing} shows that for separable
+%data with exponential loss (i.e., $l(u)\triangleq e^{-u}$), coordinate
+%descent with a suitable choice of step size converges to the $\ell_{1}$
+%max margin vector, that is
+%\[
+%\lim_{t\to\infty}\frac{\bm{\theta}^{t}}{\|\bm{\theta}^{t}\|_{2}}=\arg\min_{\bm{\theta}\in\mathbb{R}^{p}}\|\bm{\theta}\|_{1},\quad\text{subject to}\quad y_{i}\bm{\theta}^{\top}\bm{x}_{i}\geq1\quad\text{for all }1\leq i\leq n,
+%\]
+%as long as the right hand side is uniquely defined.
+studied algorithms other than gradient descent and showed that coordinate descent produces a solution with the maximum $\ell_1$ margin.
+
+Moving beyond logistic regression, which can be viewed as a one-layer neural net, the theoretical understanding of implicit regularization in deeper neural networks is still limited; see~\cite{gunasekar2018implicit} for an illustration in deep linear convolutional neural networks.
+
+%The stability bound we present here is \emph{data-independent}
+%in the sense that it does not take the distribution of the data into
+%account. Investigation of data-dependent stability bound of SGD has
+%later been done in \citep{kuzborskij2017data}.
+
+
+%\cm{Shall we
+%mention the connection to adaboost and Rosset et al?}
+%\item \emph{Gradient descent on multi-layer linear (convolutional) neural
+%networks. }\cm{The assumptions therein are way to strong and hard to
+%interpret.}
+
+%
+%\subsection{Notes}
+%Another line of work views neural nets as an \emph{inverse problem} where a true neural network is assumed. In such case, algorithms with provable guarantees has been suggested; examples include gradient descent with tensor initialization~\citep{zhong2017recovery}, gradient descent with random initialization~\citep{chen2018gradient}
+
+
+
+%\subsection{Notes}
+%In addition to the approaches we present here, compression
+%bounds \citep{arora2018stronger} and PAC-Bayes bounds \citep{neyshabur2017pac}
+%are also popular in controlling the generalization error of deep neural
+%nets. 

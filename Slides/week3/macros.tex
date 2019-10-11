@@ -1,0 +1,246 @@
+\makeatletter
+\newcommand*{\rom}[1]{\expandafter\@slowromancap\romannumeral #1@}
+\makeatother
+
+\newcommand{\eqi}[1]{\mathrel{\overset{\makebox[0pt]{\normalfont\scriptsize\sffamily (#1)}}{=}}}
+\newcommand{\lei}[1]{\mathrel{\overset{\makebox[0pt]{\normalfont\scriptsize\sffamily (#1)}}{\le}}}
+\newcommand{\gei}[1]{\mathrel{\overset{\makebox[0pt]{\normalfont\scriptsize\sffamily (#1)}}{\ge}}}
+\newcommand{\lessi}[1]{\mathrel{\overset{\makebox[0pt]{\normalfont\scriptsize\sffamily (#1)}}{\lesssim}}}
+\newcommand{\gtri}[1]{\mathrel{\overset{\makebox[0pt]{\normalfont\scriptsize\sffamily (#1)}}{\gtrsim}}}
+
+
+%%%% special operators
+
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\diagg}{\mathrm{diagg}}
+\newcommand{\rank}{\mathrm{rank}}
+\newcommand{\spann}{\mathrm{span}}
+\newcommand{\supp}{\mathrm{supp}}
+\newcommand{\sgnn}{\mathrm{sign}}
+\newcommand{\sgn}{\mathrm{sgn}}
+\newcommand{\sign}{\mathrm{sign}}
+\newcommand{\conv}{\mathrm{conv}}
+\newcommand{\cov}{\mathrm{Cov}}
+\newcommand{\var}{\mathrm{Var}}
+\newcommand{\trace}{\mathrm{trace}}
+\newcommand{\Tr}{\mathrm{Tr}}
+\newcommand{\vect}{\mathrm{Vec}}
+\newcommand{\RE}{\mathrm{RE}}
+\newcommand{\GMM}{\mathrm{GMM}}
+\newcommand{\minimize}{\mbox{minimize}}
+\newcommand{\st}{\mbox{subject to}}
+\newcommand{\argmin}{\mbox{argmin}}
+\newcommand{\argmax}{\mbox{argmax}}
+\newcommand{\svd}{\mathrm{svd}}
+\newcommand{\eigen}{\mathrm{eigen}}
+\newcommand{\sam}{\mathrm{sam}}
+\newcommand{\KL}{\normalfont \mathrm{\texttt{KL}}}
+\newcommand{\Bern}{\mathrm{Bern}}
+\newcommand{\row}{\mathrm{row}}
+\newcommand{\col}{\mathrm{col}}
+\newcommand{\where}{\text{where}}
+\newcommand{\mle}{\mathrm{MLE}}
+\newcommand{\iid}{\mathrm{i.i.d.}}
+\newcommand{\btanh}{\mathrm{\textbf{tanh}}}
+
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\bbS}{\mathbb{S}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\bfR}{\mathbf{R}}
+\newcommand{\calA}{\mathcal{A}}
+\newcommand{\veps}{\varepsilon}
+\renewcommand{\O}{\mathcal{O}}
+\renewcommand{\P}{\mathbb{P}}
+\DeclareMathOperator{\Var}{{\rm Var}}
+\DeclareMathOperator{\Cor}{\rm Corr}
+\DeclareMathOperator{\Cov}{\rm Cov}
+\DeclareMathOperator{\ind}{\mathds{1}}  % Indicator
+\newcommand{\smallfrac}[2]{{\textstyle \frac{#1}{#2}}}
+
+\newcommand*{\zero}{{\bm 0}}
+\newcommand*{\one}{{\bm 1}}
+\newcommand{\bbone}{\mathbbm{1}}
+\newcommand{\bbzero}{\mathbbm{0}}
+
+
+
+
+%%%% Norms & dot product, & brackets
+
+\newcommand{\norm}[1]{\left\|{#1}\right\|}
+\newcommand{\bignorm}[1]{\bigg|\bigg|#1\bigg|\bigg|}
+\newcommand{\opnorm}[2]{| \! | \! | #1 | \! | \! |_{{#2}}}
+\newcommand{\dotp}[2]{\langle{#1},{#2}\rangle}
+\newcommand{\inner}[2]{\left\langle #1,#2 \right\rangle}
+\newcommand{\rbr}[1]{\left(#1\right)}
+\newcommand{\sbr}[1]{\left[#1\right]}
+\newcommand{\cbr}[1]{\left\{#1\right\}}
+\newcommand{\nbr}[1]{\left\|#1\right\|}
+\newcommand{\abr}[1]{\left|#1\right|}
+
+
+
+%%%% boldface and caligraphicals
+
+\newcommand{\bff}{\mathrm{\bf f}}
+\newcommand{\ba}{\mathrm{\bf a}}
+\newcommand{\be}{\mathrm{\bf e}}
+\newcommand{\bh}{\mathrm{\bf h}}
+\newcommand{\br}{\mathrm{\bf r}}
+\newcommand{\bs}{\mathrm{\bf s}}
+\newcommand{\bt}{\mathrm{\bf t}}
+\newcommand{\bu}{\mathrm{\bf u}}
+\newcommand{\bv}{\mathrm{\bf v}}
+\newcommand{\bw}{\mathrm{\bf w}}
+\newcommand{\bx}{\mathrm{\bf x}}
+\newcommand{\by}{\mathrm{\bf y}}
+\newcommand{\bz}{\mathrm{\bf z}}
+\newcommand{\bA}{\mathrm{\bf A}}
+\newcommand{\bB}{\mathrm{\bf B}}
+\newcommand{\bZ}{\mathrm{\bf Z}}
+\newcommand{\bC}{\mathrm{\bf C}}
+\newcommand{\bD}{\mathrm{\bf D}}
+\newcommand{\bE}{\mathrm{\bf E}}
+\newcommand{\bF}{\mathrm{\bf F}}
+\newcommand{\bK}{\mathrm{\bf K}}
+\newcommand{\bT}{\mathrm{\bf T}}
+\newcommand{\bW}{\mathrm{\bf W}}
+\newcommand{\bG}{\mathrm{\bf G}}
+\newcommand{\bM}{\mathrm{\bf M}}
+\newcommand{\bH}{\mathrm{\bf H}}
+\newcommand{\bI}{\mathrm{\bf I}}
+\newcommand{\bg}{\mathrm{\bf g}}
+\newcommand{\bP}{\mathrm{\bf P}}
+\newcommand{\bV}{\mathrm{\bf V}}
+\newcommand{\bQ}{\mathrm{\bf Q}}
+\newcommand{\bR}{\mathrm{\bf R}}
+\newcommand{\bS}{\mathrm{\bf S}}
+\newcommand{\bU}{\mathrm{\bf U}}
+\newcommand{\bX}{\mathrm{\bf X}}
+\newcommand{\bY}{\mathrm{\bf Y}}
+\newcommand{\bL}{\mathrm{\bf L}}
+
+
+
+\newcommand{\xx}{\text{\boldmath $x$}}
+\newcommand{\XX}{\text{\boldmath $X$}}
+\newcommand{\yy}{\text{\boldmath $y$}}
+\newcommand{\zz}{\text{\boldmath $z$}}
+\newcommand{\YY}{\text{\boldmath $Y$}}
+\newcommand{\ZZ}{\text{\boldmath $Z$}}
+\newcommand{\WW}{\text{\boldmath $W$}}
+\newcommand{\VV}{\text{\boldmath $V$}}
+\newcommand{\UU}{\text{\boldmath $U$}}
+\newcommand{\vv}{\text{\boldmath $v$}}
+\newcommand{\ww}{\text{\boldmath $w$}}
+\newcommand{\kk}{\text{\boldmath $k$}}
+\newcommand{\RR}{\text{\boldmath $R$}}
+\newcommand{\uu}{\text{\boldmath $u$}}
+\newcommand{\uI}{\text{\boldmath $u_I$}}
+\newcommand{\II}{\text{\boldmath $I$}}
+\newcommand{\hh}{\text{\boldmath $h$}}
+\renewcommand{\aa}{\text{\boldmath $a$}}
+\newcommand{\bb}{\text{\boldmath $b$}}
+\newcommand{\cc}{\text{\boldmath $c$}}
+\newcommand{\pp}{\text{\boldmath $p$}}
+\newcommand{\bgg}{\text{\boldmath $g$}}
+\newcommand{\oo}{\text{\boldmath $o$}}
+\newcommand{\ii}{\text{\boldmath $i$}}
+\newcommand{\ff}{\text{\boldmath $f$}}
+\newcommand{\FF}{\text{\boldmath $F$}}
+
+
+
+
+
+\newcommand{\balpha}{\text{\boldmath $\alpha$}}
+\newcommand{\bpi}{\text{\boldmath $\pi$}}
+\newcommand{\bvarphi}{\text{\boldmath $\varphi$}}
+\newcommand{\bbeta}{\text{\boldmath $\beta$}}
+\newcommand{\bdelta}{\text{\boldmath $\delta$}}
+\newcommand{\btheta}{\text{\boldmath $\theta$}}
+\newcommand{\bomega}{\text{\boldmath $\omega$}}
+\newcommand{\bsigma}{\bm{\sigma}}
+\newcommand{\bDelta}{\text{\boldmath $\Delta$}}
+\newcommand{\bone}{\mathrm{\bf 1}}
+\newcommand{\bzero}{\mathrm{\bf 0}}
+\newcommand{\bet}{\text{\boldmath $\eta$}}
+\newcommand{\bxi}{\text{\boldmath $\xi$}}
+\newcommand{\bveps}{\text{\boldmath $\varepsilon$}}
+\newcommand{\bmu}{\text{\boldmath $\mu$}}
+\newcommand{\bLambda}{\text{\boldmath $\Lambda$}}
+\newcommand{\blambda}{\text{\boldmath $\lambda$}}
+\newcommand{\bgamma}{\text{\boldmath $\gamma$}}
+\newcommand{\bGamma}{\text{\boldmath $\Gamma$}}
+\newcommand{\bTheta}{\text{\boldmath $\Theta$}}
+\newcommand{\bSigma}{\text{\boldmath $\Sigma$}}
+\newcommand{\bOmega}{\text{\boldmath $\Omega$}}
+\newcommand{\bPhi}{\text{\boldmath $\Phi$}}
+\newcommand{\bXi}{\text{\boldmath $\Xi$}}
+\newcommand{\bPsi}{\text{\boldmath $\Psi$}}
+\newcommand{\bPi}{\text{\boldmath $\Pi$}}
+\newcommand{\bepsilon}{\text{\boldmath $\epsilon$}}
+
+\newcommand{\cI}{\mathcal{I}}
+\newcommand{\cB}{\mathcal{B}}
+\newcommand{\cN}{\mathcal{N}}
+\newcommand{\cS}{\mathcal{S}}
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\cV}{\mathcal{V}}
+\newcommand{\cU}{\mathcal{U}}
+\newcommand{\cO}{\mathcal{O}}
+\newcommand{\cA}{\mathcal{A}}
+\newcommand{\cP}{\mathcal{P}}
+\newcommand{\cX}{\mathcal{X}}
+\newcommand{\cM}{\mathcal{M}}
+\newcommand{\cE}{\mathcal{E}}
+\newcommand{\cT}{\mathcal{T}}
+\newcommand{\cF}{\mathcal{F}}
+\newcommand{\cW}{\mathcal{W}}
+\newcommand{\cH}{\mathcal{H}}
+\newcommand{\wtilde}{\widetilde}
+
+
+%%%% hatted and tilded letters
+
+\newcommand{\hE}{\widehat \bE}
+\newcommand{\hF}{\widehat \bF}
+\newcommand{\hf}{\widehat \bff}
+\newcommand{\hR}{\widehat \bR}
+\newcommand{\hG}{\widehat \bG}
+\newcommand{\hu}{\widehat \bu}
+\newcommand{\hvar}{\widehat \var}
+\newcommand{\hcov}{\widehat \cov}
+\newcommand{\hbveps}{\widehat\bveps}
+\newcommand{\heps}{\widehat\beps}
+\newcommand{\hSig}{\widehat\Sig}
+\newcommand{\tSig}{\widetilde\Sig}
+\newcommand{\hsig}{\widehat\sigma}
+\newcommand{\hlam}{\widehat\lambda}
+\newcommand{\hbeta}{\widehat\beta}
+\newcommand{\hLam}{\widehat \bLambda}
+\newcommand{\hmu}{\widehat\bmu}
+\newcommand{\hxi}{\widehat\bxi}
+\newcommand{\Sig}{\mathbf{\Sigma}}
+\newcommand{\hw}{\widehat \bw}
+\newcommand{\wt}{\widetilde}
+
+
+
+%%%%  for editting and other commands
+
+
+\newcommand{\RMK}[1]{{\color{blue}{[#1]}}}
+\newcommand{\TODO}[1]{{\color{red}{[#1]}}}
+\newcommand{\mcomment}[1]{\marginpar{\tiny{#1}}}
+\newcommand{\fcomment}[1]{\footnote{\tiny{#1}}}
+\newcommand{\overbar}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
+\newcommand{\ud}{{\,\mathrm{d}}}
+
+
+
+
+
+

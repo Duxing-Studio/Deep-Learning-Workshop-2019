@@ -1,0 +1,182 @@
+%% LyX 2.3.2 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[english]{article}
+
+\pdfoutput=1
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{geometry}
+\geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+%\usepackage{babel}
+
+%\RequirePackage{natbib}
+\usepackage{verbatim}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{bm}
+\usepackage{bbm}
+\usepackage{amsmath}
+\usepackage{subcaption}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{hhline}
+\hypersetup{
+ colorlinks,linkcolor=red,anchorcolor=blue,citecolor=blue}
+\usepackage{breakurl}
+%\usepackage{cite}
+\usepackage{amsthm}
+\usepackage{dsfont}
+\usepackage{array}
+%\usepackage{mathrsfs}
+\usepackage{color}
+
+
+
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+\floatstyle{ruled}
+\newfloat{algorithm}{tbp}{loa}
+\providecommand{\algorithmname}{Algorithm}
+\floatname{algorithm}{\protect\algorithmname}
+
+\newcommand{\mypara}[1]{\paragraph{#1.}}
+
+%%%% for colors
+
+\definecolor{yxc}{RGB}{255,0,0}
+\definecolor{yjc}{RGB}{125,0,0}
+\definecolor{cm}{RGB}{0,0,200}
+\definecolor{kzw}{RGB}{0,150,0}
+\newcommand{\cm}[1]{\textcolor{cm}{[CM: #1]}}
+\newcommand{\yxc}[1]{\textcolor{yxc}{[YXC: #1]}}
+\newcommand{\yjc}[1]{\textcolor{yjc}{[YJC: #1]}}
+
+
+\allowdisplaybreaks
+
+\usepackage{enumitem}
+\setlist[itemize]{leftmargin=1em}
+\setlist[enumerate]{leftmargin=1em}
+
+\usepackage{algorithm}% http://ctan.org/pkg/algorithms
+\usepackage{algorithmic}% http://ctan.org/pkg/algorithmicx
+\usepackage{arydshln}
+
+\newcommand{\DLFigs}{figure}
+\newcommand{\citep}{\cite}
+\newcommand{\citealp}{\cite}
+\makeatother
+
+
+%\startlocaldefs
+%\numberwithin{equation}{section}
+%\theoremstyle{plain}
+%\newtheorem{thm}{Theorem}[section]
+%\newtheorem{definition}{Definition}[section]
+%\newtheorem{cor}{Corollary}[section]
+%\newtheorem{rem}{Remark}[section]
+%\newtheorem{lem}{Lemma}[section]
+%\newtheorem{ass}{Assumption}[section]
+%\endlocaldefs
+
+
+\input{macros}
+
+%%%%%
+% Default fixed font does not support bold face
+\DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{10} % for bold
+\DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{10}  % for normal
+
+% Custom colors
+\usepackage{color}
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0}
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+
+
+
+
+\begin{document}
+\theoremstyle{plain} 
+\newtheorem{lem}{\textbf{Lemma}} 
+\newtheorem{prop}{\textbf{Proposition}}
+\newtheorem{thm}{\textbf{Theorem}}\setcounter{thm}{0}
+\newtheorem{corollary}{\textbf{Corollary}} 
+\newtheorem{example}{\textbf{Example}}
+\newtheorem{definition}{\textbf{Definition}} 
+\newtheorem{fact}{\textbf{Fact}}
+\newtheorem{claim}{\textbf{Claim}}
+
+\theoremstyle{definition}
+
+\theoremstyle{remark}\newtheorem{remark}{\textbf{Remark}}\newtheorem{conjecture}{Conjecture}\newtheorem{condition}{\textbf{Condition}}\newtheorem{assumption}{\textbf{Assumption}}
+
+\title{A Selective Overview of Deep Learning\footnotetext{Author
+names are sorted alphabetically.}}
+
+\author{Jianqing Fan\thanks{Department of Operations Research and Financial Engineering, Princeton
+University, Princeton, NJ 08544, USA; Email: \texttt{\{jqfan, congm,
+yiqiaoz\}@princeton.edu}.} \and Cong Ma\footnotemark[3] \and Yiqiao Zhong\footnotemark[1] }
+
+
+\maketitle
+\input{abstract.tex}
+\medskip
+\noindent\textbf{Keywords:} neural networks, over-parametrization, stochastic gradient descent, approximation theory, generalization error.
+
+\setcounter{tocdepth}{2}
+\tableofcontents{}
+
+
+%\begin{keyword}
+%\kwd{neural networks}
+%\kwd{over-parametrization}
+%\kwd{stochastic gradient descent}
+%\kwd{approximation theory}
+%\kwd{generalization error}
+%\end{keyword}
+
+%\setcounter{tocdepth}{2}
+%\tableofcontents
+%\newpage
+\input{intro_Mar20.tex}
+%\noindent\RMK{something to mention:} \\
+%The rise of deep learning is accompanied with the revolutionary of depth (use a figure or a table to illustrate this).
+
+%empirical success: alphaGo, image recognition, machine translation (BERT???)
+\input{supervised_Mar1.tex}
+\input{CNN_new.tex}
+\input{RNN_Mar7.tex}
+\input{skip_Mar7.tex}
+\input{unsupervised_Mar7.tex}
+\input{approximation_Mar7.tex}
+\input{training_Mar20.tex}
+
+\input{theory_Mar20.tex}
+%\input{humanaid.tex}
+\input{discussion_Mar20.tex}
+%\RMK{Something to (briefly) mention: choice of activation functions, saturation, initialization}
+
+\section*{Acknowledgements}
+J.~Fan is supported in part by the NSF grants DMS-1712591 and DMS-1662139, the NIH grant R01-GM072611 and the ONR grant N00014-19-1-2120. We thank Ruying Bao, Yuxin Chen, Chenxi Liu, Weijie Su, Qingcan Wang and Pengkun Yang for helpful comments and discussions.
+
+
+%\bibliographystyle{plain}
+
+%\bibliographystyle{ims}
+
+\bibliographystyle{plain}
+\bibliography{bibDeepLearning}
+
+
+\end{document}

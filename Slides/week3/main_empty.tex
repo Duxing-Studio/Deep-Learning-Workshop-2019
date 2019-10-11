@@ -1,0 +1,256 @@
+% \documentclass[handout]{beamer}
+\documentclass[presentation]{beamer}
+% \usepackage{ctex}
+\usecolortheme{duxing}
+\usefonttheme{duxing}
+\useinnertheme{duxing}
+ 
+\usepackage[utf8]{inputenc}
+\usepackage[UKenglish]{babel}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+%\RequirePackage{natbib}
+\usepackage{verbatim}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{bm}
+\usepackage{bbm}
+\usepackage{amsmath}
+\usepackage{subcaption}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{hhline}
+\usepackage{breakurl}
+%\usepackage{cite}
+\usepackage{amsthm}
+\usepackage{dsfont}
+\usepackage{array}
+%\usepackage{mathrsfs}
+\usepackage{color}
+
+\input{macros.tex}
+
+\institute{\includegraphics[height=0.7cm]{sysu_logo.png}\includegraphics[height=0.7cm]{duxing_logo.png}}
+
+\title{Neural Network}
+
+\subtitle{A Selective Overview of Deep Learning}
+
+\author{Tao Huang}
+
+\date{}
+
+
+\begin{document}
+ 
+\frame{\titlepage}
+
+\section{Feed-forward neural networks}
+
+\begin{frame}{Model setup}
+    Deep neural networks (DNNs) use composition of a series of simple nonlinear functions to model nonlinearity
+    \begin{equation}
+    \hh^{(L)} = \bg^{(L)} \circ  \bg^{(L-1)} \circ \ldots \circ \bg^{(1)} (\xx),
+    \end{equation}
+    \pause
+    for $\ell = 1,\ldots,L$, define
+    \begin{equation}\label{eq:fc}
+        \hh^{(\ell)} = \bg^{(l)} \big(\bm{h}^{(l-1)}\big) \triangleq \bsigma \big(\bW^{(\ell)} \hh^{(\ell-1)} + \bb^{(\ell)}  \big),
+    \end{equation}
+    \pause
+    The activation function $\bsigma(\cdot)$ is usually applied element-wise, and a popular choice is the ReLU (Rectified Linear Unit) function:
+    \begin{equation}
+        [\bsigma(\zz)]_j = \max\{ z_j, 0 \}.
+    \end{equation} 
+\end{frame}
+
+\begin{frame}{Model setup}
+    \begin{figure}
+        \centering
+        \includegraphics[scale=0.3]{MLP}\caption{A feed-forward neural network with an input layer, two hidden layers and an output layer. The input layer represents raw features $\{\bm{x}_{i}\}_{1\leq i\leq n}$. Both hidden layers compute an affine transform (a.k.s. indices) of the input and then apply an element-wise activation function $\bsigma(\cdot)$. Finally, the output returns a linear transform followed by the softmax activation (resp.~simply a linear transform) of the hidden layers for the classification (resp.~regression) problem. \label{fig:FFNN}}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Model setup}
+    The \textit{soft-max} function:
+    \begin{equation}
+        \begin{aligned}
+            f_k(\xx; \btheta) \triangleq  \frac{\exp(z_k)}{\sum_k \exp(z_k)}, \, \forall\, k\in[K], \\ \where~ \zz = \bW^{(L+1)} \hh^{(L)} + \bb^{(L+1)} \in \mathbb{R}^{K}.
+        \end{aligned}
+    \end{equation}
+    \pause
+    Loss
+    \begin{equation}\label{eq:crossentropy}
+        \mathcal{L}(\ff(\xx; \btheta), y)=-\sum_{k=1}^K \bbone\{y = k\} \log p_k,
+    \end{equation}
+    ,where $\btheta \triangleq \{ \bW^{(\ell)}, \bb^{(\ell)}: 1\leq \ell \leq L+1\}$.
+\end{frame}
+
+\begin{frame}{Back-propagation\\ in computational graphs}
+    The key to the above training procedure, namely SGD, is the calculation of the gradient $\nabla \ell_{\cB}(\btheta)$, where
+    \begin{equation}\label{eq:loss-nn}
+        \ell_{\cB}(\btheta) \triangleq |\cB|^{-1} \sum_{i \in \cB} \mathcal{L}(\ff(\xx_i ; \btheta), y_i).
+    \end{equation}
+    \pause
+    \begin{equation}\label{eq:grad}
+        \begin{aligned}
+            \frac{\partial \ell_{\cB}}{\partial \hh^{(\ell-1)}} &=  \frac{\partial \hh^{(\ell)}}{\partial \hh^{(\ell-1)}} \cdot \frac{\partial \ell_{\cB}}{\partial \hh^{(\ell)}} \\
+            & = (\bW^{(\ell)})^\top \mathsf{diag}\left( \bbone\{\bW^{(\ell)} \hh^{(\ell-1)} + \bb^{(\ell)}  \ge \bm{0}\}  \right) \frac{\partial \ell_{\cB}}{\partial \hh^{(\ell)}}
+        \end{aligned}
+    \end{equation}
+\end{frame}
+
+\begin{frame}{Back-propagation\\ in computational graphs}
+    \begin{equation}\label{eq:Wupdate}
+        \bW^{(\ell)} \leftarrow \bW^{(\ell)} - \eta \frac{\partial \ell_{\cB}}{\partial \bW^{(\ell)}}, \, \where \, \frac{\partial \ell_{\cB}}{\partial W_{jm}^{(\ell)}} = \frac{\partial \ell_{\cB}}{\partial h_j^{(\ell)}} \cdot \sigma' \cdot h_m^{(\ell-1)},
+    \end{equation}
+    \pause
+    MLP with a single hidden layer and an $\ell_2$ regularization:
+    \begin{equation}\label{eq:regloss}
+    \ell_{\cB}^\lambda (\btheta) = \ell_{\cB}(\btheta) + r_\lambda(\btheta) = \ell_{\cB}(\btheta) + \lambda \Big( \sum_{j,j'} \big(W_{j,j'}^{(1)}\big)^2 + \sum_{j,j'} \big(W_{j,j'}^{(2)}\big)^2 \Big),
+    \end{equation}
+\end{frame}
+
+\begin{frame}{Back-propagation\\ in computational graphs}
+    \begin{figure}[t]
+        \centering
+        \includegraphics[width=0.75\textwidth]{compuGraph2}\caption{The computational graph illustrates the loss \eqref{eq:regloss}. For simplicity, we omit the bias terms. Symbols inside nodes represent functions, and symbols outside nodes represent function outputs (vectors/scalars). {\normalfont \texttt{matmul}} is matrix multiplication, {\normalfont \texttt{relu}} is the ReLU activation, {\normalfont \texttt{cross entropy}} is the cross entropy loss, and {\normalfont \texttt{SoS}} is the sum of squares.} \label{fig:comgraph}
+    \end{figure}
+\end{frame}
+
+
+\begin{frame}{Numerical experiments}
+    
+\end{frame}
+
+\section{Convolutional neural networks}
+
+
+\begin{frame}{Convolutional layer (CONV)}
+    \begin{equation}\label{eq:conv}
+        O^{k}_{ij}= \big\langle \left[\bm{X}\right]_{ij}, \bm{F}_{k} \big\rangle = \sum_{i'=1}^w \sum_{j'=1}^w \sum_{l=1}^{d_3} [\bm{X}]_{i+i'-1, j+j'-1, l} [\bm{F}_{k}]_{i',j',l}.
+    \end{equation}
+    \pause
+    \begin{equation}\label{eq:relu}
+    \tilde{X}_{ijk} = \sigma(O_{ijk}), \, \forall\, i \in [d_1-w+1], j \in [d_2-w+1], k \in [\tilde d_3].
+    \end{equation}
+\end{frame}
+
+\begin{frame}{Convolutional layer}
+    \begin{figure}
+    \centering
+    \includegraphics[height=0.4\textwidth]{convolution_3D}
+
+    \caption{$\bm{X}\in \mathbb{R}^{28\times 28 \times 3}$ represents the input feature consisting of $28 \times 28$ spatial coordinates in a total number of 3  channels / feature maps. $\bm{F}_{k}\in\mathbb{R}^{5\times 5 \times 3}$ denotes the $k$-th filter with size $5\times 5$. The third dimension $3$ of the filter automatically matches the number $3$  of channels in the previous input. Every 3D patch of $\bm{X}$ gets convolved with the filter $\bm{F}_{k}$ and this as a whole results in a single output feature map $\tilde{X}_{:,:,k}$ with size $24\times 24\times 1$. Stacking the outputs of all the filters $\{\bm{F}_{k}\}_{1\leq k\leq K}$ will lead to the output feature with size $24\times 24\times K$. \label{fig:Convolution-operation}}
+
+    \end{figure}
+\end{frame}
+
+
+\begin{frame}{Pooling layer (POOL)}
+    \begin{figure}
+    \centering
+    
+    \includegraphics[width=0.95 \linewidth]{pooling}\caption{A $2\times 2$ max pooling layer extracts the maximum of 2 by 2 neighboring pixels$\,$/$\,$features across the spatial dimension. }\label{fig:pooling}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{LeNet}
+    \begin{figure}
+    \centering
+    \includegraphics[width=0.9 \textwidth]{LeNet}\caption{LeNet is composed of an input layer, two convolutional layers, two pooling layers and three fully-connected layers. Both convolutions are valid and use filters with size $5 \times 5$. In addition, the two pooling layers use $2 \times 2$ average pooling. \label{fig:CNN}}
+    \end{figure}
+    
+\end{frame}
+
+
+\begin{frame}{Numerical experiments}
+    
+\end{frame}
+
+\section{Recurrent neural networks}
+
+\begin{frame}{Vanilla RNNs}
+    \begin{figure}
+    \centering
+    \includegraphics[width=0.8 \textwidth]{RNN1-1}
+    \caption{Vanilla RNNs with different inputs/outputs settings. (a) has one input but multiple outputs; }
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Vanilla RNNs}
+    \begin{figure}
+    \centering
+    \includegraphics[width=0.8 \textwidth]{RNN1-2}
+    \caption{Vanilla RNNs with different inputs/outputs settings.(b) has multiple inputs but one output; }
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Vanilla RNNs}
+    \begin{figure}
+    \centering
+    \includegraphics[width=0.8 \textwidth]{RNN1-3}
+    \caption{Vanilla RNNs with different inputs/outputs settings. (c) has multiple inputs and outputs. Note that the parameters are shared across time steps.}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Vanilla RNNs}
+    
+    \begin{equation}
+        \hh_t = \ff_{\btheta}(\hh_{t-1}, \xx_t).
+    \end{equation}
+    \pause
+    \begin{align}
+        \hh_t  &= \btanh\left( \bW_{hh} \hh_{t-1}+ \bW_{xh} \xx_t + \bb_\hh \right), \\
+        \tanh(a) &= \frac{e^{2a} - 1}{e^{2a} + 1}, \\
+        \zz_t &= \bsigma \left(\bW_{hy} \hh_t + \bb_\zz \right),
+    \end{align}
+    \pause
+    \begin{equation}
+        \begin{aligned}
+            \ell_{\cT}(\btheta) &= \sum_{t \in \cT} \cL(y_t, \zz_t) \\
+             &= - \sum_{t \in \cT} \sum_{k=1}^K \bbone\{y_t = k\} \log \left( \frac{\exp([\zz_t]_k)}{\sum_k \exp([\zz_t]_k)} \right),
+        \end{aligned}
+    \end{equation}
+\end{frame}
+
+\begin{frame}
+    \frametitle{LSTM}
+    \begin{align}
+        \left( \begin{array}{c} \ii_t \\ \ff_t \\ \oo_t \\ \bgg_t \end{array} \right) &= \left( \begin{array}{c} \bsigma \\ \bsigma \\ \bsigma \\ \btanh \end{array} \right) \bW \left( \begin{array}{c} \hh_{t-1} \\ \xx_t \\ 1 \end{array} \right), \\
+        \cc_t &= \ff_t \odot \cc_{t-1} + \ii_t \odot \bgg_t, \\
+        \hh_t &= \oo_t \odot \btanh(\cc_t),
+    \end{align}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Multilayer RNNs}
+    
+    \begin{equation}
+        \hh_t^{\ell} =  \btanh \left[\bW^\ell \left( \begin{array}{c} \hh_t^{\ell-1} \\ \hh_{t-1}^\ell \\ 1 \end{array} \right) \right], \quad \text{for all}\, \ell \in [L], \qquad \hh_t^{0} \triangleq \xx_t.
+    \end{equation}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Multilayer RNNs}
+    \begin{figure}
+        \centering
+        \includegraphics[width = 0.7\textwidth]{RNN2}
+        \caption{A vanilla RNN with two hidden layers. Higher-level hidden states $\hh_t^{\ell}$ are determined by the old states $\hh_{t-1}^\ell$ and lower-level hidden states $\hh_t^{\ell-1}$. Multilayer RNNs generalize both feed-forward neural nets and one-hidden-layer RNNs.}\label{fig:RNN2}
+    \end{figure}
+
+\end{frame}
+
+\begin{frame}[standout]
+    Questions
+\end{frame}
+
+\end{document}
+

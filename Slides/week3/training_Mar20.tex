@@ -1,0 +1,360 @@
+\section{Training deep neural nets }\label{sec:opt}
+The \textit{existence} of a good function approximator in the NN function class does not explain why in practice we can easily \textit{find} them.
+In this section, we introduce standard methods, namely \emph{stochastic gradient descent} (SGD) and its variants, to train deep neural networks (or to find such a good approximator). As with many statistical machine learning tasks, training DNNs follows the \emph{empirical risk minimization} (ERM) paradigm which solves the following optimization problem
+\begin{equation}
+\text{minimize}_{\btheta\in\mathbb{R}^{p}}\qquad\ell_{n}\left(\btheta\right)\triangleq\frac{1}{n}\sum_{i=1}^{n}\mathcal{L}\left(f\left(\bm{x}_{i};\btheta\right),y_{i}\right).\label{eq:ERM_for_DL}
+\end{equation}
+Here $\mathcal{L}(f(\bm{x}_{i};\btheta),y_{i})$ measures the discrepancy between the prediction $f(\bm{x}_{i};\btheta)$ of the neural network and the true label $y_{i}$. Correspondingly, denote by $\ell(\btheta) \triangleq \mathbb{E}_{(\bm{x},y)\sim\mathcal{D}}[\mathcal{L}(f(\bm{x};\btheta),\bm{y})]$ the out-of-sample error, where $\mathcal{D}$ is the joint distribution over $(y, \bm{x})$.  Solving ERM~(\ref{eq:ERM_for_DL}) for deep neural nets faces various challenges that roughly fall into the following three categories.
+\begin{itemize}
+\item \emph{Scalability and nonconvexity.} Both the sample size $n$ and the number of parameters $p$ can be huge for modern deep learning applications, as we have seen in Table~\ref{tab:intro}.
+%In such a large-scale setting, many
+Many optimization algorithms are not practical due to the computational costs and memory constraints. What is worse, the empirical loss function $\ell_{n}(\bm{\theta})$ in deep learning is often nonconvex. It is \emph{a priori }not clear whether an optimization algorithm can drive the empirical loss (\ref{eq:ERM_for_DL}) small.
+
+\item \emph{Numerical stability.} With a large number of layers in DNNs, the magnitudes of the hidden nodes can be drastically different, which may result in the ``exploding gradients'' or ``vanishing gradients'' issue during the training process. This is because the recursive relations across layers often lead to exponentially increasing$\,$/$\,$decreasing values in both forward passes and backward passes.
+
+\item \emph{Generalization performance.} Our ultimate goal is to find a parameter $\hat {\bm{\theta}}$ such that the out-of-sample error $\ell(\hat \btheta)$ is small. %However, in the over-parametrized regime where the number of parameters $p$ in a deep neural network is much larger than the sample size $n$,
+However, in the over-parametrized regime where $p$ is much larger than $n$, the underlying neural network has the potential to fit the training data perfectly while performing poorly on the test data. To avoid this overfitting issue, proper regularization, whether explicit or implicit, is needed in the training process for the neural nets to generalize.
+\end{itemize}
+
+In the following three subsections, we discuss practical solutions$\,$/$\,$proposals to address these challenges.
+
+\subsection{Stochastic gradient descent \label{sec:stochastic-opt}}
+
+Stochastic gradient descent (SGD)~\citep{robbins1951stochastic} is by far the most popular optimization algorithm to solve ERM~(\ref{eq:ERM_for_DL})
+for large-scale problems. It has the following simple update rule:
+\begin{equation}
+\btheta^{t+1}=\btheta^{t}-\eta_{t}G(\bm{\theta}^{t})\qquad\text{with}\qquad G\left(\bm{\theta}^{t}\right)=\nabla\mathcal{L}\left(f\left(\bm{x}_{i_{t}};\btheta^{t}\right),y_{i_{t}}\right)\label{eq:SGD_DL}
+\end{equation}
+for $t=0,1,2,\ldots$, where $\eta_{t}>0$ is the step size (or learning rate), $\btheta^{0}\in\mathbb{R}^{p}$ is an initial point and $i_{t}$ is chosen randomly from $\{1,2,\cdots, n\}$. It is easy to verify that $G(\bm{\theta}^{t})$ is an unbiased estimate of $\nabla\ell_{n}(\bm{\theta}^{t})$.
+%Depending on the rule of selecting $i_t$ in each step, there are two variants of SGD:
+%\begin{itemize}
+%	\item \emph{One-pass SGD}. Each $i_{t}$ is drawn \emph{without} replacement from $\{1,2,\cdots,n\}$ and the maximum number of steps is $n$, the number of samples available. In this setting, the stochastic gradient $G(\bm{\theta}^{t})$ is an unbiased estimate of $\nabla\ell(\bm{\theta}^{t})$, the gradient of the \emph{population} loss and one-pass SGD is regarded as a method to minimize $\ell(\btheta)$.
+%	\item \emph{Multi-pass SGD}. Each $i_{t}$ is drawn \emph{with} replacement from $\{1,2,\cdots,n\}$ independently and there is no essential upper limit on the number of steps. Under this rule, the stochastic gradient $G(\bm{\theta}^{t})$ is an unbiased estimate of $\nabla\ell_{n}(\bm{\theta}^{t})$, the gradient of the \emph{empirical} loss and multi-pass SGD can be viewed as an algorithm to minimize $\ell_{n}(\btheta)$.
+%\end{itemize}
+%This division is merely for theoretical purpose and practitioners often strike a balance between these two approaches: we often run SGD for a number of \emph{epochs}, where in each epoch we follow the rule for one-pass SGD.
+The advantage of SGD is clear: compared with gradient descent, which goes over the entire dataset in every update, SGD uses a single example in each update and hence is considerably more efficient in terms of both computation and memory (especially in the first few iterations).
+%In addition, the one-pass SGD allows to update the parameters online, i.e., when the training
+%data arrive on the fly. These desirable features make SGD scalable to huge datasets, as is often the case in deep learning.
+
+Apart from practical benefits of SGD, how well does SGD perform theoretically in terms of minimizing $\ell_{n}(\btheta)$? We begin with the convex case, i.e., the case where the loss function is convex w.r.t.~$\bm{\theta}$. It is well understood in literature that with proper choices of the step sizes $\{\eta_{t}\}$, SGD is guaranteed to achieve both \emph{consistency} and \emph{asymptotic normality}.
+\begin{itemize}
+\item {\emph{Consistency}.} If $\ell(\btheta)$ is a strongly convex function\footnote{For results on consistency and asymptotic normality, we consider the case where in each step of SGD, the stochastic gradient is computed using a fresh sample $(y, \bm{x})$ from $\mathcal{D}$. This allows to view SGD as an optimization algorithm to minimize the population loss $\ell(\btheta)$.}, then under some mild conditions\footnote{One example of such condition can be constraining the second moment of the gradients: $\E\left[\|\nabla\mathcal{L}\left(\bm{x}_{i},y_{i};\btheta^{t}\right)\|_{2}^{2}\right]\le C_{1}+C_{2}\|\btheta^{t}-\btheta^{*}\|_{2}^{2}$ for some $C_{1},C_{2}>0$. See~\cite{bottou1998online} for details.}, learning rates that satisfy
+\begin{equation}\label{cond:lr}
+\sum_{t=0}^{\infty}\eta_{t}=+\infty\qquad\text{and}\qquad\sum_{t=0}^{\infty}\eta_{t}^{2}<+\infty
+\end{equation}
+guarantee almost sure convergence to the unique minimizer $\btheta^* \triangleq \argmin_{\btheta} \ell(\btheta)$, i.e., $\btheta^{t}\xrightarrow{\mbox{a.s.}}\btheta^{*}$ as $t\to\infty$~\citep{robbins1951stochastic,kiefer1952stochastic,bottou1998online,kushner2003stochastic}. The requirements in \eqref{cond:lr} can be viewed from the perspective of bias-variance tradeoff: the first condition ensures that the iterates can reach the minimizer (controlled bias), and the second ensures that stochasticity does not prevent convergence (controlled variance).
+
+\item {\emph{Asymptotic normality}.} It is proved by~\cite{polyak1979adaptive} that for robust linear regression with fixed dimension $p$, under the choice $\eta_{t}=t^{-1}$, $\sqrt{t}\,(\btheta^{t}-\btheta^{*})$ is asymptotically normal under some regularity conditions (but $\btheta^{t}$ is not asymptotically efficient in general). Moreover, by averaging the iterates of SGD,~\cite{polyak1992acceleration} proved that even with a \emph{larger} step size $\eta_{t}\propto t^{-\alpha},\alpha\in(1/2,1)$, the averaged iterate $\bar{\btheta}^{t}=t^{-1}\sum_{s=1}^{t}\btheta^{s}$ is asymptotic efficient for robust linear regression. These strong results show that SGD with averaging performs as well as the MLE asymptotically, in addition to its computational efficiency. %\cm{To Yiqiao, mention that this holds for fixed $p$ and diverging $n$.}
+\end{itemize}
+
+These classical results, however, fail to explain the effectiveness of SGD when dealing with nonconvex loss functions in deep learning. Admittedly, finding global minima of nonconvex functions is computationally infeasible in the worst case. Nevertheless, recent work~\citep{allen2018convergence,du2018gradient} bypasses the worst case scenario by focusing on losses incurred by over-parametrized deep learning models. In particular, they show that (stochastic) gradient descent converges linearly towards the \emph{global }minimizer of $\ell_{n}(\btheta)$ as long as the neural network is sufficiently \emph{over-parametrized}. This phenomenon is formalized below.
+
+\begin{thm}[Theorem~2 in \citealp{allen2018convergence}]Let $\{(y_i, \bm{x}_{i})\}_{1 \leq i \leq n}$
+be a training set satisfying $\min_{i,j:i\neq j}\|\bm{x}_{i}-\bm{x}_{j}\|_{2}\geq\delta>0$. Consider fitting the data using a feed-forward neural network~(\ref{model:1}) with
+ReLU activations. Denote by $L$ (resp.~$W$) the depth (resp.~width) of the network. Suppose that the neural network is sufficiently over-parametrized, i.e.,
+\begin{equation}
+W\gg\mathsf{poly}\left(n,L,\frac{1}{\delta}\right), \label{eq:overparametrize}
+\end{equation}
+where $\mathsf{poly}$ means a polynomial function. Then with high probability, running SGD~(\ref{eq:SGD_DL}) with \emph{certain
+random initialization} and properly chosen step sizes yields $\ell_{n}(\bm{\theta}^{t})\leq\varepsilon$
+in $t\asymp\log\frac{1}{\varepsilon}$ iterations. \end{thm}
+
+Two
+notable features are worth mentioning:~(1) first, the network under
+consideration is sufficiently over-parametrized (cf.~(\ref{eq:overparametrize})) in which the number of parameters is \emph{much} larger than the number of samples,
+and (2) one needs to initialize the weight matrices to be in near-isometry such that the magnitudes of the hidden nodes do not blow up or vanish. In a nutshell, \emph{over-parametrization}
+and \emph{random initialization} together ensure that the loss function
+(\ref{eq:ERM_for_DL}) has a benign landscape\footnote{In~\cite{allen2018convergence},
+the loss function $\ell_{n}(\btheta)$ satisfies the PL condition.} around the initial
+point, which in turn implies fast convergence of SGD iterates.
+
+
+%Next, we present two theoretical results of SGD in the nonconvex scenario: the first one deals with \emph{general} nonconvex functions and the second focuses on the loss functions of neural networks.
+%\begin{itemize}
+%\item \emph{SGD with general nonconvex loss functions.} We abuse the notation and denote by $\ell (\bm{\theta})$ a general nonconvex loss function (not necessarily the expectation of (\ref{eq:ERM_for_DL})). When dealing with nonconvex $\ell(\bm{\theta})$, computational hardness results (e.g., NP-hardness) prevent us from finding the local optimum in general, not to mention the global optimum. Therefore a modest and realistic goal would be to find \emph{a first-order stationary point} $\bm{\theta}$ of $\ell(\cdot)$, i.e., the point $\btheta$ obeying $\nabla\ell (\bm{\theta})=\bm{0}$. The following result from stochastic optimization shows that one can indeed find such (approximate) first-order stationary points using SGD.
+%
+%\begin{thm}[Corollary~2.2 in \citealp{ghadimi2013stochastic}]Suppose
+%that $\ell (\bm{\theta})$ is 1-smooth in the sense that $\|\nabla\ell(\bm{\theta}_{1})-\nabla\ell(\bm{\theta}_{2})\|_{2}\leq\|\bm{\theta}_{1}-\bm{\theta}_{2}\|_{2}$
+%for all $\bm{\theta}_{1}$ and $\bm{\theta}_{2}$. Consider the stochastic gradient descent method, where in each iteration~$t$ the stochastic
+%gradient $G(\bm{\theta}^{t})$ is an unbiased estimate of $\nabla\ell(\bm{\theta}^{t})$ and the variance\footnote{Here the expectation and the variance are conditioning on all the randomness up to the $t$-th iteration. } of the stochastic gradient is upper bounded by $\sigma^{2}$, i.e., $\mathbb{E}[\|G(\bm{\theta}^{t})-\nabla\ell(\bm{\theta}^{t})\|_{2}^{2}]\leq\sigma^{2}$. Then running SGD for $T$ steps with properly chosen constant step sizes achieves
+%\[
+%\mathbb{E}\big[\|\nabla\ell(\hat{\bm{\theta}})\|_{2}^{2}\big]\lesssim\frac{1}{T}+\frac{\sigma}{\sqrt{T}}.
+%\]
+%Here $\hat{\bm{\theta}}$ is chosen from the SGD iterates $\{\bm{\theta}^{t}\}_{0\leq t\leq T}$
+%uniformly at random.
+%\end{thm}
+%
+%
+%
+%In addition to first-order stationary points, a line of work~\citep{ge2015escaping, fang2019sharp, jin2019stochastic} focuses on finding second-order
+%stationary points using SGD (or its variants); see the reference therein
+%for the precise definition of second-order stationary points. However, a first-order (or second-order) stationary point does not necessarily translate to a point $\btheta$ that has small loss $\ell(\btheta)$.
+%\emph{SGD for over-parametrized neural nets.} Concentrating on the nonconvex loss functions of deep neural networks, several recent papers~\citep{allen2018convergence,du2018gradient} %\end{itemize}
+
+There are certainly other challenges for vanilla SGD to train deep neural nets: (1) training algorithms are often implemented in GPUs, and therefore it
+is important to tailor the algorithm to the infrastructure, (2) the
+vanilla SGD might converge very slowly for deep neural networks,
+albeit good theoretical guarantees for well-behaved problems, and (3) the learning
+rates $\{\eta_{t}\}$ can be difficult to tune in practice. To address
+the aforementioned challenges, three important variants of SGD, namely
+\emph{mini-batch SGD, momentum-based SGD}, and \emph{SGD with adaptive
+learning rates }are introduced.
+
+\subsubsection{Mini-batch SGD}
+
+Modern computational infrastructures (e.g., GPUs)
+can evaluate the gradient on a number (say 64) of examples as efficiently
+as evaluating that on a single example. To utilize this advantage, mini-batch SGD
+with batch size $K\geq1$ forms the stochastic gradient through $K$
+random samples:
+\begin{equation}
+\bm{\theta}^{t+1}=\bm{\theta}^{t}-\eta_{t}G(\bm{\theta}^{t})\qquad\text{with}\qquad G(\bm{\theta}^{t})=\frac{1}{K}\sum_{k=1}^{K}\nabla\mathcal{L}\big(f\big(\bm{x}_{i_{t}^{k}};\btheta^{t}\big),y_{i_{t}^{k}}\big),\label{eq:mini-SGD}
+\end{equation}
+where for each $1\leq k\leq K$, $i_{t}^{k}$ is sampled uniformly
+from $\{1,2,\cdots,n\}$. Mini-batch SGD, which is an ``interpolation''
+between gradient descent and stochastic gradient descent, achieves
+the best of both worlds: (1) using $1\ll K\ll n$ samples to estimate
+the gradient, one effectively reduces the variance and hence accelerates
+the convergence, and (2) by taking the batch size $K$ appropriately (say
+64 or 128), the stochastic gradient $G(\bm{\theta}^{t})$ can be efficiently
+computed using the matrix computation toolboxes on GPUs.
+
+\subsubsection{Momentum-based SGD}
+While mini-batch SGD forms the foundation
+of training neural networks, it can sometimes be slow to converge
+due to its oscillation behavior~\citep{sutskever2013importance}. Optimization community has long investigated
+how to accelerate the convergence of gradient descent,
+which results in a beautiful technique called \emph{momentum methods}
+\citep{polyak1964some,nesterov1983method}. Similar to gradient descent with moment, \emph{momentum-based SGD}, instead of moving the iterate
+$\bm{\theta}^{t}$ in the direction of the current stochastic gradient $G(\btheta^t)$, smooth the past (stochastic) gradients $\{G(\btheta^t)\}$ to stabilize the update directions. Mathematically,
+let $\bm{v}^{t}\in\mathbb{R}^{p}$ be the direction of update in the
+$t$th iteration, i.e.,
+\[
+\bm{\theta}^{t+1}=\bm{\theta}^{t}-\eta_{t}\bm{v}^{t}.
+\]
+Here $\bm{v}^{0}=G(\bm{\theta}^{0})$ and for $t=1,2,\cdots$
+\begin{equation} \label{eq6.6}
+\bm{v}^{t}=\rho\bm{v}^{t-1}+G(\bm{\theta}^{t})
+\end{equation}
+with $0<\rho<1$. A typical choice of $\rho$ is 0.9. Notice
+that $\rho=0$ recovers the mini-batch SGD (\ref{eq:mini-SGD}),
+where no past information of gradients is used. A simple unrolling
+of $\bm{v}^{t}$ reveals that $\bm{v}^{t}$ is actually an exponential
+averaging of the past gradients, i.e., $\bm{v}^{t}=\sum_{j=0}^{t}\rho^{t-j}G(\bm{\theta}^{j}).$
+Compared with vanilla mini-batch SGD, the inclusion of the momentum
+``smoothes'' the oscillation direction and accumulates the persistent
+descent direction. We want to emphasize that theoretical justifications of momentum in the \emph{stochastic} setting is not fully understood~\citep{kidambi2018insufficiency, jain2017accelerating}.
+
+%Note that \eqref{eq6.6} is indeed the same as exponential smoothing in time-domain in statistics:
+%$$
+%  \bm{v}^{t}=\rho\bm{v}^{t-1}+ (1 - \rho) G(\bm{\theta}^{t}),
+%$$
+%which yields the solution $\bm{v}^{t}= (1-\rho) \sum_{j=0}^{t}\rho^{t-j}G(\bm{\theta}^{j})$.  The factor $(1-\rho)$ can be absorbed into the learn rate or step size parameter.
+
+\subsubsection{SGD with adaptive learning rates}
+
+In optimization, \emph{preconditioning} is often used to accelerate first-order optimization algorithms. In principle, one can apply this to SGD, which yields the following update rule:
+\begin{equation}
+\bm{\theta}^{t+1}=\bm{\theta}^{t}-\eta_{t}\bm{P}_{t}^{-1}G(\bm{\theta}^{t})\label{eq:precondition-SGD}
+\end{equation}
+with $\bm{P}_t \in \mathbb{R}^{p\times p}$ being a preconditioner at the $t$-th step. Newton's method can be viewed as one type of preconditioning where $\bm{P}_{t} = \nabla^2 \ell(\btheta^t)$. The advantages of preconditioning are two-fold: first, a good preconditioner reduces the condition number by changing the local geometry to be more homogeneous, which is amenable to fast convergence; second, a good preconditioner frees practitioners from laboring tuning of the step sizes, as is the case with Newton's method. AdaGrad, an adaptive gradient method proposed by~\cite{duchi2011adaptive}, builds a preconditioner $\bm{P}_{t}$ based on information of the past gradients:
+\begin{equation}
+\bm{P}_{t}= \Big \{ \mathsf{diag}\Big(\sum_{j=0}^{t}G\left(\bm{\theta}^{t}\right)G
+\left(\bm{\theta}^{t}\right)^{\top}\Big) \Big \}^{1/2} \label{eq:adagrad-precondition}.
+\end{equation}
+Since we only require the diagonal part, this preconditioner (and its inverse) can be efficiently computed in practice. In addition, investigating~(\ref{eq:precondition-SGD}) and~(\ref{eq:adagrad-precondition}), one can see that AdaGrad adapts to the importance
+of each coordinate of the parameters by setting smaller learning rates
+for frequent features, whereas larger learning rates for those infrequent
+ones. In practice, one adds a small quantity $\delta > 0$ (say $10^{-8}$) to the diagonal entries to avoid singularity (numerical underflow). A notable drawback of AdaGrad is that the effective learning rate vanishes quickly along the learning process. This
+is because the historical sum of the gradients can only
+increase with time. RMSProp~\citep{hinton2012neural} is a popular
+remedy for this problem which incorporates the idea of exponential averaging:
+\begin{equation}
+\bm{P}_{t}= \Big \{ \mathsf{diag}\Big(\rho \bm{P}_{t-1} +
+(1-\rho)G\left(\bm{\theta}^{t}\right)G\left(\bm{\theta}^{t}\right)^{\top}
+\Big) \Big \}^{1/2} \label{eq:rmsprop-precondition}.
+\end{equation}
+Again, the decaying parameter $\rho$ is usually set to be $0.9$.
+Later, Adam~\citep{kingma2014adam, reddi2018convergence} combines
+the momentum method and adaptive learning rate and becomes the default training algorithms in many deep learning applications.
+%Note that for all the methods
+%mentioned above, we use the same step size$\,$/$\,$learning rate $\eta_{t}$
+%for all the coordinates in $\btheta$, albeit $\eta_{t}$ can vary
+%with time $t$. Nothing prevents us from applying different step sizes
+%for each coordinate of the parameters $\Theta$. Moreover, one would
+%prefer an adaptive learning rate which can automatically adapt to
+%the importance of each dimension.
+
+%This is precisely the goal of AdaGrad
+%, which uses to automatically determine the learning rate for each coordinate.
+%Formally, one records a historical sum $\bm{r}^{t}\in\mathbb{R}^{p}$
+%via the following recursive formula
+%\[
+%\bm{r}^{t+1}=\bm{r}^{t}+\bm{v}^{t}\otimes\bm{v}^{t},\qquad\text{for }t=0,1,2,\cdots,
+%\]
+%with $\bm{r}^{0}=\bm{0}$ and $\otimes$ denoting the element-wise
+%product. Then the update rule of AdaGrad is given by
+%\begin{equation}
+%\bm{\theta}^{t+1}=\bm{\theta}^{t}-\frac{\epsilon}{\sqrt{\bm{r}^{t+1}}+\delta}\otimes\bm{v}^{t},\label{eq:AdaGrad}
+%\end{equation}
+%where $\sqrt{\cdot}$ denotes the element-wise square root and $\delta>0$
+%is set to be some small constant, say $10^{-8}$, to prevent numerical
+%overflow. In addition $\epsilon>0$ is some global learning rate,
+%which is usually a fixed small constant, say, 0.01.
+%\subsection{Batch normalization}\label{sec:batch-norm}
+\subsection{Easing numerical instability}\label{sec:batch-norm}
+
+%We have already seen some partial solutions: (1) the use of ReLU function helps overcome vanishing gradients because its derivative remains $1$ even for a large input (recall Eqn.~\ref{eq:grad})---this is in contrast with the sigmoid function which tends to ``kill'' gradients; (2) skip connections stabilize the gradients by adding an identity map (recall Eqn.~\ref{eq:skipgrad}).
+
+For very deep neural networks or RNNs with long dependencies, training difficulties often arise when the values of nodes have different magnitudes or when the gradients ``vanish'' or ``explode'' during back-propagation. Here we discuss three partial solutions to alleviate this problem.
+
+\subsubsection{ReLU activation function}
+
+One useful characteristic of the ReLU function is that its derivative is either $0$ or $1$, and the derivative remains $1$ even for a large input. This is in sharp contrast with the standard sigmoid function $(1 + e^{-t})^{-1}$ which results in a very small derivative when inputs have large magnitude. The consequence of small derivatives across many layers is that gradients tend to be ``killed'', which means that gradients become approximately zero in deep nets. %Indeed, during back-propagation, gradient calculation is multiplicative due to the recursive relation~\eqref{eq:grad}, and thus the standard sigmoid function is susceptible to producing vanishing gradients.
+
+The popularity of the ReLU activation function and its variants (e.g., leaky ReLU) is largely attributable to the above reason. It has been well observed that the ReLU activation function has superior training performance over the sigmoid function~\citep{krizhevsky2012imagenet, maas2013rectifier}.
+
+\subsubsection{Skip connections}
+
+We have introduced skip connections in Section~\ref{sec:skip}. Why are skip connections helpful for reducing numerical instability? This structure does not introduce a larger function space, since the identity map can be also represented with ReLU activations: $\xx = \bsigma(\xx) - \bsigma(-\xx)$.
+
+One explanation is that skip connections bring ease to the training$\,$/$\,$optimization process. Suppose that we have a general nonlinear function $\bF(\xx_\ell; \btheta_{\ell})$. With a skip connection, we represent the map as $\xx_{\ell+1} = \xx_\ell + \bF(\xx_\ell; \btheta_{\ell})$ instead. Now the gradient $\partial \xx_{\ell+1} / \partial \xx_{\ell}$ becomes
+\begin{equation}\label{eq:skipgrad}
+\frac{\partial \xx_{\ell+1}}{\partial \xx_{\ell}} = \bI + \frac{\partial \bF(\xx_\ell; \btheta_{\ell})}{\partial \xx_\ell} \qquad \text{instead of} \qquad \frac{\partial \bF(\xx_\ell; \btheta_{\ell})}{\partial \xx_\ell},
+\end{equation}
+where $\bI$ is an identity matrix. By the chain rule, gradient update requires computing products of many components, e.g., $\frac{\partial \xx_L}{\partial \xx_1} = \prod_{\ell=1}^{L-1} \frac{\partial \xx_{\ell+1}}{\partial \xx_\ell}$, so it is desirable to keep the spectra (singular values) of each component $\frac{\partial \xx_{\ell+1}}{\partial \xx_\ell}$ close to $1$. In neural nets, with skip connections, this is easily achieved if the parameters have small values; otherwise, this may not be achievable even with careful initialization and tuning. Notably, training neural nets with hundreds of layers is possible with the help of skip connections.
+
+%With skip connections, it is plausible that improved training/optimization finds ``better'' local optima. To what extent or in what sense these the local optima are better? While a thorough understanding remains elusive, we believe that an answer requires statistical analyses of optimization algorithms, since skip connections do not enlarge the function space.
+
+\subsubsection{Batch normalization}
+
+%Here, we discuss another widely used approach: \textit{batch normalization}~\citep{ioffe2015batch}.
+%Another approach to alleviate numerical instability is \textit{batch normalization}~\citep{ioffe2015batch}. The key to batch normalization is \emph{standardization}.
+Recall that in regression analysis, one often standardizes the design matrix so that the features have zero mean and unit variance. Batch normalization extends this standardization procedure from the input layer to all the hidden layers. Mathematically, fix a mini-batch of input data $\{(\bm{x}_{i},y_{i})\}_{i\in \mathcal{B}}$, where $\mathcal{B} \subset [n]$. Let $\bm{h}_{i}^{(\ell)}$ be the feature of the $i$-th example in the $\ell$-th layer ($\ell=0$ corresponds to the input $\bm{x}_{i}$). The batch normalization layer computes the normalized version of $\bm{h}_{i}^{(\ell)}$ via the following steps:
+\begin{align*}
+\bm{\mu} & \triangleq \frac{1}{\left|\mathcal{B}\right|}\sum_{i\in \mathcal{B}}\bm{h}_{i}^{(\ell)},\qquad \bm{\sigma}^{2}  \triangleq\frac{1}{\left|\mathcal{B}\right|}\sum_{i\in \mathcal{B}}\big(\bm{h}_{i}^{(\ell)}-\bm{\mu}\big)^{2} \qquad\text{and}\qquad \bm{h}_{i,\text{norm}}^{(l)}  \triangleq\frac{\bm{h}_{i}^{(\ell)}-\bm{\mu}}{\bm{\sigma}}.
+\end{align*}
+Here all the operations are element-wise. In words, batch normalization computes the z-score for each feature over the mini-batch $\mathcal{B}$ and use that as inputs to subsequent layers. To make it more versatile, a typical batch normalization layer has two additional learnable parameters $\bm{\gamma}^{(\ell)}$ and $\bm{\beta}^{(\ell)}$ such that
+\[
+\bm{h}_{i,\text{new}}^{(l)}=\bm{\gamma}^{(l)}\odot\bm{h}_{i,\text{norm}}^{(l)}+\bm{\beta}^{(l)}.
+\]
+Again $\odot$ denotes the element-wise multiplication. As can be seen, $\bm{\gamma}^{(\ell)}$ and $\bm{\beta}^{(\ell)}$ set the new feature $\bm{h}_{i \text{new}}^{(l)}$ to have mean $\bm{\beta}^{(\ell)}$ and standard deviation $\bm{\gamma}^{(\ell)}$. The introduction of batch normalization makes the training of neural networks much easier and smoother. More importantly, it allows the neural nets to perform well over a large family of hyper-parameters including the number of layers, the number of hidden units, etc. At test time, the batch normalization layer needs more care. For brevity we omit the details and refer to~\cite{ioffe2015batch}.
+
+%\cm{The current version does not explain the intuition of
+%batch normalization, nor discuss benefits of batch normalization (improve
+%gradient flow, initialization, etc.) We can discuss this.}
+
+%One analogous problem in statistics is when covariates/features of
+%input data have varying means and scales. In ,
+%this can often lead to multicollinearity, which means some variables
+%are heavily correlated. From the perspective of numerical stability,
+%this issue manifests in a large condition number of $\bX^{\top}\bX$
+%where $\bX$ is the design matrix. To improve prediction and inference,
+%a common practice for this issue is to standardize the data, that
+%is, shifting and rescaling each covariate/feature to have zero mean
+%and unit variance. Likewise, in numerical analysis and optimization,
+%preconditioning is usually applied to make a matrix or loss function
+%better conditioned.
+
+%In statistics, a common practice for prepossessing is to standardize data, that is, making each covariate/feature of the input data to have zero mean and unit variance. This can Similar preprocessing on the input data has been done in optimization community to make the loss function well conditioned.
+
+
+
+
+\subsection{Regularization techniques} \label{sec:regularization}
+So far we have focused on training techniques to drive the empirical loss (\ref{eq:ERM_for_DL}) small efficiently. Here we proceed to discuss common practice to improve the generalization power of trained neural nets.
+
+
+\subsubsection{Weight decay} \label{sec:weight}
+One natural regularization idea is to add an $\ell_{2}$
+penalty to the loss function. This regularization technique is known
+as the weight decay in deep learning. We have seen one example in
+\eqref{eq:regloss}. For general deep neural nets, the loss to optimize
+is $\ell_n^{\lambda}(\btheta)=\ell_{n}(\btheta)+r_{\lambda}(\btheta)$ where %\cm{To Yiqiao, I think we do not need to spend too much on weight decay.}
+\[
+r_{\lambda}(\btheta)=\lambda\sum_{\ell=1}^{L}\sum_{j,j'}\big[W_{j,j'}^{(\ell)}\big]^{2}.
+\]
+Note that the bias (intercept) terms are not penalized. If $\ell_{n}(\btheta)$
+is a least square loss, then regularization with weight decay gives
+precisely ridge regression. The penalty $r_{\lambda}(\btheta)$ is a smooth
+function and thus it can be also implemented efficiently with back-propagation.
+
+\subsubsection{Dropout} \label{sec:dropout}
+
+Dropout, introduced by~\cite{hinton2012improving}, prevents overfitting by randomly dropping out subsets of features
+during training. Take the $l$-th layer of the feed-forward neural
+network as an example. Instead of propagating all the features in $\bm{h}^{(\ell)}$ for later
+computations, dropout randomly omits some of its entries by
+\[
+\bm{h}_{\text{drop}}^{(\ell)}=\bm{h}^{(\ell)}\odot\mathsf{mask}^{\ell},
+\]
+where $\odot$ denotes element-wise multiplication as before, and $\mathsf{mask}^{\ell}$ is a vector of Bernoulli variables with success probability $p$. It is sometimes useful to rescale the features $\bm{h}_{\text{inv drop}}^{(\ell)}=\bm{h}_{\text{drop}}^{(\ell)}/p$, which is called \textit{inverted dropout}. During training, $\mathsf{mask}^{\ell}$ are i.i.d. vectors across mini-batches and layers. However, when testing on fresh samples, dropout is disabled
+and the original features $\hh^{(\ell)}$ are used to compute the
+output label $y$. It has been nicely shown by~\cite{wager2013dropout}
+that for generalized linear models, dropout serves as adaptive
+regularization. In the simplest case of linear regression, it is equivalent
+to $\ell_{2}$ regularization. Another possible way to understand
+the regularization effect of dropout is through the lens of bagging~\citep{deeplearningbook}.
+Since different mini-batches has different masks, dropout can be viewed
+as training a large ensemble of classifiers at the same time, with
+a further constraint that the parameters are shared. %This viewpoint has not been theoretically justified.
+Theoretical justification remains elusive.
+%
+%\TODO{I think we can mention random forests and add a figure---this
+%looks interesting.}
+
+%In the end, we show a snippet of the code to illustrate how to build a neural net with dropout.
+%\begin{python}
+%MLP = Sequential([
+%  Flatten(),
+%  Dense(512, activation=tf.nn.relu),
+%  Dropout(0.25),
+%  Dense(10, activation=tf.nn.softmax)
+%])
+%\end{python}
+
+\subsubsection{Data augmentation}\label{sec:aug}
+Data augmentation is a technique of enlarging the dataset when we have knowledge about invariance structure of data. It implicitly increases the sample size and usually regularizes the model effectively. For example, in image classification, we have strong prior knowledge about what invariance properties a good classifier should possess. The label of an image should not be affected by translation, rotation, flipping, and even crops of the image. Hence one can augment the dataset by randomly translating, rotating and cropping the images in the original dataset.
+
+Formally, during training we want to minimize the loss $\ell_{n}(\btheta)=\sum_{i}\cL(f(\xx_{i};\btheta),y_{i})$
+w.r.t.~parameters $\btheta$, and we know a priori that certain transformation
+$T\in\mathcal{T}$ where $T:\R^{d}\to\R^{d}$ (e.g., affine transformation)
+should not change the category$\,$/$\,$label of a training sample. In principle,
+if computation costs were not a consideration, we could convert this
+knowledge to a constraint $f_{\btheta}(T\xx_{i})=f_{\btheta}(\xx_{i}),\forall\,T\in\mathcal{T}$
+in the minimization formulation. Instead of solving a constrained
+optimization problem, data augmentation enlarges the training dataset
+by sampling $T\in\mathcal{T}$ and generating new data $\{(T\xx_{i},y_{i})\}$.
+In this sense, data augmentation induces invariance properties through sampling, which results in a much bigger dataset than the original one. 
+
+
+
+%\subsection{Note}
+
+%Stochastic gradient descent, as a stochastic approximation algorithm
+%was first proposed in the seminal work by Robbins and Monro published
+%in the \emph{The Annals of Mathematical Statistics}~\citep{robbins1951stochastic}.
+%Since then, it has found numerous applications in optimization, signal
+%processing, machine learning,~etc.
+
+%The momentum method we introduced in this section is more akin to
+%the \emph{Heave-ball} method proposed by Polyak~\citep{polyak1964some}.
+%The goal then was to find optimal methods to optimize a smooth convex
+%function. Later, Nesterov came up with an ingenious momentum-based
+%method, known as Nesterov's accelerated methods~\citep{nesterov1983method},
+%to achieve optimal convergence rate for smooth functions under the
+%oracle model; see~\citep{nesterov2013introductory} for more details.
+
+%The original AdaGrad~\citep{duchi2011adaptive} uses (\ref{eq:adagrad-precondition}) without $\mathsf{diag}(\cdot)$ as a preconditioner. However, this is computationally challenging when the dimension
+%$p$ of the parameter is large.
+%
+%For brevity, we do not discuss the weight initialization methods,
+%i.e., the choice of the initial point $\btheta^{0}$. Unlike convex
+%optimization, where initialization of (stochastic) gradient descent
+%has minor impact on the convergence property, proper weight initialization
+%plays an important role in training deep neural networks~\citep{sutskever2013importance}.
+%See~\citep{glorot2010understanding,he2015delving} for some popular
+%choices.
+
+
+

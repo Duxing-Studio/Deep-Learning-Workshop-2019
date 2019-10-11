@@ -1,0 +1,113 @@
+\section{Representation power: approximation theory}\label{sec:approx}
+Having seen the building blocks of deep learning models in the previous sections, it is natural to ask: what is the benefits of composing multiple layers of nonlinear functions. In this section, we address this question from a approximation theoretical point of view. Mathematically, letting $\cH$ be the space of functions representable by neural nets (NNs),  how well can a function $f$ (with certain properties) be approximated by functions in $\cH$. We first revisit universal approximation theories, which are mostly developed for shallow neural nets (neural nets with a single hidden layer), and then provide recent results that demonstrate the benefits of depth in neural nets. Other notable works include Kolmogorov-Arnold superposition theorem~\citep{arnold2009functions, sprecher1965structure}, and circuit complexity for neural nets~\citep{parberry1994circuit}.
+
+%Over several decades, efforts from various communities have addressed this question for different types of nets.
+
+
+\subsection{Universal approximation theory for shallow NNs}
+The universal approximation theories study the approximation of $f$ in a space~$\cF$ by a function represented by a one-hidden-layer neural net
+\begin{equation}\label{def:HN}
+%g(\xx) = \sum_{j=1}^N c_j \sigma_*(\ww_j ^\top \xx - b_j) + c_0,
+g(\xx) = \sum_{j=1}^N c_j \sigma_*(\ww_j ^\top \xx - b_j),
+\end{equation}
+where $\sigma_*: \R \to \R$ is certain activation function and $N$ is the number of hidden units in the neural net. For different space $\cF$ and activation function $\sigma_*$, there are upper bounds and lower bounds on the approximation error $\| f - g \|$. See~\cite{pinkus1999approximation} for a comprehensive overview. Here we present representative results.
+
+First, as $N \to \infty$, any continuous function $f$ can be approximated by some $g$ under mild conditions. Loosely speaking, this is because each component $\sigma_*(\ww_j ^\top \xx - b_j)$ behaves like a basis function %(e.g., Fourier basis, polynomial basis),
+and functions in a suitable space $\cF$ admits a basis expansion. Given the above heuristics, the next natural question is: what is the rate of approximation for a finite $N$?
+
+Let us restrict the domain of $\xx$ to a unit ball $B^d$ in $\R^d$. For $p \in [1,\infty)$ and integer $m \ge 1$, consider the $L^p$ space and the Sobolev space with standard norms
+\begin{align*}
+ \| f \|_p = \Big[ \int_{B^n} | g(\xx) |^p \; d\xx  \Big]^{1/p}, \qquad \| f \|_{m,p} = \Big[ \sum_{0 \le |\kk| \le m} \| D^{\kk} f \|_p^p \Big]^{1/p},
+\end{align*}
+where $D^{\kk} f$ denotes partial derivatives indexed by $\kk \in \mathbb{Z}_+^d$. Let $\cF \triangleq \cF^m_p$ be the space of functions $f$ in the Sobolev space with $\| f \|_{m,p} \le 1$. Note that functions in~$\cF$ have bounded derivatives up to $m$-th order, and that smoothness of functions is controlled by $m$ (larger $m$ means smoother). Denote by $\cH_N$ the space of functions with the form \eqref{def:HN}. The following general upper bound is due to~\cite{mhaskar1996neural}.
+\begin{thm}[Theorem~2.1 in \cite{mhaskar1996neural}]\label{thm:approx1}
+Assume $\sigma_*: \R \to \R$ is such that $\sigma_*$ has arbitrary order derivatives in an open interval $I$, and that $\sigma_*$ is not a polynomial on $I$. Then, for any $p \in [1,\infty)$, $d \ge 2$, and integer $m \ge 1$,
+\begin{equation*}
+\sup_{f \in \cF^m_p} \inf_{g \in \cH_N^{\phantom{a}}} \| f - g \|_p \le C_{d,m,p}\, N^{-m/d},
+\end{equation*}
+where $C_{d,m,p}$ is independent of $N$, the number of hidden units.
+\end{thm}
+In the above theorem, the condition on $\sigma_*(\cdot)$ is mainly technical. This upper bound is useful when the dimension $d$ is not large. It clearly implies that the one-hidden-layer neural net is able to approximate any smooth function with enough hidden units. However, it is unclear how to find a good approximator $g$; nor do we have control over the magnitude of the parameters (huge weights are impractical). While increasing the number of hidden units $N$ leads to better approximation, the exponent $-m/d$ suggests the presence of the \emph{curse of dimensionality}. The following (nearly) matching lower bound is %a consequence of~\citep{devore1989optimal}.
+stated in~\cite{maiorov2000near}.
+\begin{thm}[Theorem~5 in \cite{maiorov2000near}]\label{thm:approx2-2}
+Let $p \ge 1$, $m \ge 1$ and $N \ge 2$. If the activation function is the standard sigmoid function $\sigma(t) = (1 + e^{-t})^{-1}$, then
+\begin{equation}\label{ineq:approxlower2}
+\sup_{f \in \cF^m_p} \inf_{g \in \cH_N^{\phantom{a}}} \| f - g \|_p \ge C'_{d,m,p}\, (N\log N)^{-m/d},
+\end{equation}
+where $C'_{d,m,p}$ is independent of $N$.
+\end{thm}
+Results for other activation functions are also obtained by~\cite{maiorov2000near}. Moreover, the term $\log N$ can be removed if we assume an additional continuity condition~\citep{mhaskar1996neural}.
+
+%For any $f$, suppose an approximation method $Q_N: \cF \to \cH_N$ produces $g = Q_N(f)$; ideally, such $g$ attains $\inf_{g \in \cH_N} \| f - g \|_p$. A consequence of~\cite{mhaskar1996neural} implies that any $Q_N$ such that parameters $c_j$, $\ww_j$, and $b_j$ ($j \in [N]$) continuously depends on the input function $f$ satisfies the lower bound
+%\begin{equation}\label{ineq:approxlower}
+%\sup_{f \in \cF^m_p} \| f - Q_N f \|_p \ge C'_{d,m,p}\, N^{-m/d}.
+%\end{equation}
+
+%\begin{thm}\label{thm:approx2}
+%Let $Q_N: \cF \to \cH_N$ be any method of approximation where the parameters $c_j$, $\ww_j$, and $b_j$ ($j \in [N]$) are continuously dependent on %the function being approximated. Then,
+%\begin{equation}\label{ineq:approxlower}
+%\sup_{f \in \cF^m_p} \| f - Q_N f \|_p \ge C'_{d,m,p}\, N^{-m/d},
+%\end{equation}
+%where $C'_{d,m,p}$ is independent of $N$.
+%\end{thm}
+%There are additional results obtained in~\citep{maiorov2000near}. In particular, even if we drop the requirement of continuity, a similar lower bound holds for the logistic activation function $\sigma_*(t) = (1+e^{-t})^{-1}$ (with $N$ replaced by $N\log N$ in  (\ref{ineq:approxlower})).
+
+For the natural space $\cF^m_p$ of smooth functions, the exponential dependence on $d$ in the upper and lower bounds may look unappealing. However,~\cite{barron1993universal} showed that for a different function space, there is a good dimension-free approximation by the neural nets. Suppose that a function $f: \mathbb{R}^{d} \mapsto \mathbb{R}$ has a Fourier representation
+\begin{equation} \label{eq5.3}
+f(\xx) = \int_{\R^{d}} e^{i \langle \bomega, \xx \rangle} \tilde f (\bomega)\; d\bomega,
+\end{equation}
+where $\tilde f (\bomega) \in \mathbb{C}$. Assume that $f(\bzero) = 0$ and that the following quantity is finite
+\begin{equation}\label{def:Cf}
+C_f = \int_{\R^{d}} \| \bomega \|_2 | \tilde f (\bomega) | \; d\bomega.
+\end{equation}
+\cite{barron1993universal} uncovers the following dimension-free approximation guarantee.
+\begin{thm}[Proposition~1 in \cite{barron1993universal}]\label{thm:approx3}
+Fix a $C>0$ and an arbitrary probability measure $\mu$ on the unit ball $B^d$ in $\R^d$. For every function $f$ with $C_f \le C$ and every $N \ge 1$, there exists some $g \in \cH_N$ such that
+\begin{equation*}
+\left[ \int_{B^d} ( f(\xx) - g(\xx))^2 \, \mu(d\xx) \right]^{1/2} \le \frac{2C}{\sqrt{N}}.
+\end{equation*}
+Moreover, the coefficients of $g$ may be restricted to satisfy $\sum_{j=1}^N |c_j| \le 2C$.% and $c_0 = f(\bzero)$.
+\end{thm}
+The upper bound is now independent of the dimension $d$. %The intuition is similar to Monte Carlo method: $f$ is in the closure of the convex hull of $\{ \sigma_*(\ww_j ^\top \xx - b_j) \}$, so $f$ can be viewed as an expected function. Thus, sampling using $N$ units produces the bound $2C / \sqrt{N}$, where $2C$ is a bound on the variance.
+However, $C_f$ may implicitly depend on $d$, as the formula in \eqref{def:Cf} involves an integration over $\R^{d}$ (so for some functions $C_f$ may depend exponentially on $d$). Nevertheless, this theorem does characterize an interesting function space with an improved upper bound. Details of the function space are discussed by~\cite{barron1993universal}. This theorem can be generalized; see~\cite{makovoz1996random} for an example.
+
+To help understand why a dimensionality-free approximation holds, let us appeal to a heuristic argument given by Monte Carlo simulations. It is well-known that Monte Carlo approximation errors are independent of dimensionality in evaluation of high-dimensional integrals.  Let us generate $\{\bomega_j\}_{1\leq j \leq N}$ randomly from a given density $p(\cdot)$ in $\R^d$.  Consider the approximation to \eqref{eq5.3} by
+\begin{equation} \label{eq5.4}
+g_N(\xx) = \frac{1}{N} \sum_{j=1}^N c_j e^{i \langle \bomega_j, \xx \rangle}, \qquad c_j = \frac{\tilde f (\bomega_j)}{p(\bomega_j)}.
+\end{equation}
+Then, $g_N(\xx)$ is a one-hidden-layer neural network with $N$ units and the sinusoid activation function.  Note that $\E g_N(\xx) = f(\xx)$, where the expectation is taken with respect to randomness $\{\bomega_j\}$.  Now, by independence, we have
+$$
+    \E( g_N(\xx) - f(\xx))^2 = \frac{1}{N} \var(c_j e^{i \langle \bomega_j, \xx \rangle})\leq   \frac{1}{N} \E c_j^2,
+$$
+if $\E c_j^2 < \infty$.  Therefore, the rate is independent of the dimensionality $d$, though the constant can be.
+
+
+
+
+\subsection{Approximation theory for multi-layer NNs}
+The approximation theory for multilayer neural nets is less understood compared with neural nets with one hidden layer. Driven by the success of deep learning, there are many recent papers focusing on expressivity of deep neural nets. As studied by~\cite{telgarsky2016benefits, eldan2016power, mhaskar2016learning, poggio2017and, bauer2017deep, schmidt2017nonparametric, lin2017does,rolnick2017power}, deep neural nets excel at representing \textit{composition} of functions. This is perhaps not surprising, since deep neural nets are themselves defined by composing layers of  functions. Nevertheless, it points to a new territory rarely studied in statistics before. Below we present a result based on~\cite{lin2017does,rolnick2017power}.
+
+Suppose that the inputs $\xx$ have a bounded domain $[-1,1]^d$ for simplicity. As before, let $\sigma_*: \R \to \R$ be a generic function, and $\bsigma_* = (\sigma_*, \cdots, \sigma_*)^\top$ be element-wise application of $\sigma_*$. Consider a neural net which is similar to \eqref{eq:fc} but with scaler output: $g(\xx) = \bW_\ell \bsigma_*(\cdots \bsigma_*(\bW_2 \bsigma_*(\bW_1 \xx))\cdots)$. A unit or neuron refers to an element of vectors $\bsigma_*(\bW_k \cdots \bsigma_*(\bW_2 \bsigma_*(\bW_1 \xx)) \cdots)$ for any $k=1,\ldots,\ell-1$. For a multivariate polynomial $p$, define $m_k(p)$ to be the smallest integer such that, for any $\epsilon > 0$, there exists a neural net $g(\xx)$ satisfying $\sup_\xx \left| p(\xx) - g(\xx) \right| < \epsilon$, with $k$ hidden layers (i.e., $\ell = k+1$) and no more than $m_k(p)$ neurons in total. Essentially, $m_k(p)$ is the minimum number of neurons required to approximate $p$ arbitrarily well.
+
+\begin{thm}[Theorem~4.1 in \cite{rolnick2017power}]\label{thm:approx4}
+Let $p(\xx)$ be a monomial $x_1^{r_1} x_2^{r_2} \cdots x_d^{r_d}$ with $q = \sum_{j=1}^d r_j$. Suppose that $\sigma_*$ has derivatives of order $2q$ at the origin, and that they are nonzero. Then,\\
+(i) $m_1(p) = \prod_{j=1}^d (r_j + 1)$; \\
+(ii) $\min_k m_k(p) \le \sum_{j=1}^d \left( 7 \lceil \log_2(r_j) \rceil + 4  \right)$.
+\end{thm}
+
+This theorem reveals a sharp distinction between shallow networks (one hidden layer) and deep networks. To represent a monomial function, a shallow network requires exponentially many neurons in terms of the dimension $d$, whereas linearly many neurons suffice for a deep network (with bounded $r_j$). The exponential dependence on $d$, as shown in Theorem~\ref{thm:approx4}(i), is resonant with the curse of dimensionality widely seen in many fields; see~\cite{donoho2000high}. One may ask: how does depth help? Depth circumvents this issue, at least for certain functions, by allowing us to represent function composition efficiently. Indeed, Theorem~\ref{thm:approx4}(ii) offers a nice result with clear intuitions: it is known that the product of two scalar inputs can be represented using $4$ neurons~\citep{lin2017does}, so by composing multiple products, we can express monomials with $O(d)$ neurons.
+
+Recent advances in nonparametric regressions also support the idea that deep neural nets excel at representing composition of functions~\citep{bauer2017deep, schmidt2017nonparametric}. In particular,~\cite{bauer2017deep} considered the nonparametric regression setting where we want to estimate a function $\hat f_n(\xx)$ from i.i.d.~data $\mathcal{D}_n = \{ (y_i, \xx_i) \}_{1\leq i\leq n}$. If the true regression function $f(\xx)$ has certain hierarchical structure with intrinsic dimensionality\footnote{Roughly speaking, the true regression function can be represented by a tree where each node has at most $d^*$ children. See~\cite{bauer2017deep} for the precise definition.} $d^*$, then the error
+\begin{equation*}
+\E_{\mathcal{D}_n} \E_{\xx} \left| \hat f_n(\xx) - f(\xx) \right|^2
+\end{equation*}
+has an optimal minimax convergence rate $O(n^{-\frac{2q}{2q+d^*}})$, rather than the usual rate $O(n^{-\frac{2q}{2q+d}})$ that depends on the ambient dimension $d$. Here $q$ is the smoothness parameter. This provides another justification for deep neural nets: if data are truly hierarchical, then the quality of approximators by deep neural nets depends on the intrinsic dimensionality, which avoids the curse of dimensionality.
+%
+%Some other notations are recently proposed to study the function space of DNNs, including spectral norms, margins, etc.; see~\cite{NIPS2017_7204, }.
+
+We point out that the approximation theory for deep learning is far from complete.
+%The existing theory has not yet fully explained the successes of deep learning algorithms.
+For example, in Theorem~\ref{thm:approx4}, the condition on $\sigma_*$ excludes the widely used ReLU activation function, there are no constraints on the magnitude of the weights (so they can be unreasonably large)%, and the proof of (ii) uses a special type of nets
+.
+
+%Moreover, as we will soon discuss, the \textit{existence} of neural nets as good function approximators does not explain why in practice we can easily \textit{find} them.

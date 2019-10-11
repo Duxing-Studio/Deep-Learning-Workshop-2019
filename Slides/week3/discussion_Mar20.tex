@@ -1,0 +1,32 @@
+\section{Discussion}\label{sec:discuss}
+
+Due to space limitations, we have omitted several important deep learning models; notable examples include deep reinforcement learning~\citep{mnih2015human}, deep probabilistic graphical models~\citep{salakhutdinov2009deep}, variational autoencoders~\citep{kingma2013auto}, transfer learning~\citep{yosinski2014transferable}, etc. Apart from the modeling aspect, interesting theories on generative adversarial networks~\citep{arora2017generalization, bai2018approximability}, recurrent neural networks~\citep{AL2018-RNNgen}, connections with kernel methods~\citep{jacot2018neural,arora2019fine} are also emerging. We have also omitted the inverse-problem view of deep learning where the data are assumed to be generated from a certain neural net and the goal is to recover the weights in the NN with as few examples as possible. Various algorithms (e.g., GD with spectral initialization) have been shown to recover the weights successfully in some simplified settings~\citep{zhong2017recovery, soltanolkotabi2017learning, goel2018learning, mondelli2018connection, chen2018gradient,fu2018local}.
+
+In the end, we identify a few important directions for future research.
+\begin{itemize}
+\item{\emph{New characterization of data distributions.} The success of deep learning relies on its power of efficiently representing complex functions relevant to real data. Comparatively, classical methods often have optimal guarantee if a problem has a certain known structure, such as smoothness, sparsity, and low-rankness~\citep{stone1982optimal, donoho1994ideal, candes2009power,chen2019noisy}, but they are insufficient for complex data such as images. How to characterize the high-dimensional real data that can free us from known barriers, such as the curse of dimensionality is an interesting open question? % We have discussed hierarchical models \citep{bauer2017deep, schmidt2017nonparametric} in the nonparametric statistics literature in Section~\ref{sec:approx}, which suggests a way of overcoming the curse of dimensionality, but this also leaves many problems open.
+}
+
+%These questions are connected to nonparametric statistics, where, as shown in Section~\ref{sec:approx}, hierarchical models can be well expressed by deep neural nets and the accuracy depends on the intrinsic dimensionality. This suggests a way of overcoming the curse of dimensionality, but also leaves many problems open. We believe that a thorough understanding, if ever possible, requires deciphering properties of deep models.
+%}
+%\item{\emph{Statistical properties of optimization algorithms.} We have seen that particular algorithms may have regularization effects even without explicit regularizers. It is interesting to study (1) how common training practices change the statistical properties of neural networks, and conversely (2) how desirable statistical properties push for new training algorithms and techniques.
+
+%One specific statistical property, which most current deep neural networks lack, is \textit{stability}. It is well known that deep neural nets are susceptible to small adversarial perturbations \citep{szegedy2013intriguing}. Another desirable property is \textit{interpretability}, which is not found for most neural nets. We believe that robust and interpretable training procedures have great practical relevance.
+%}
+\item \emph{Understanding various computational algorithms for deep learning.} As we have emphasized throughout this survey, computational algorithms (e.g., variants of SGD) play a vital role in the success of deep learning. They allow fast training of deep neural nets and probably contribute towards the good generalization behavior of deep learning in practice. Understanding these computational algorithms and devising better ones are crucial components in understanding deep learning. 
+
+
+\item{\emph{Robustness.} It has been well documented that DNNs are sensitive to small adversarial perturbations that are indistinguishable to humans~\citep{szegedy2013intriguing}. This raises serious safety issues once if deploy deep learning models in applications such as self-driving cars, healthcare, etc. It is therefore crucial  to refine current training practice to enhance robustness in a principled way~\citep{singh2018hierarchical}.  %We believe that for these problems, future success of deep learning depends on fusing domain knowledge into the training pipeline.
+%We believe that addressing these issues well are crucial for a much wider application of deep learning
+}
+
+
+\item{\emph{Low SNRs.} Arguably, for image data and audio data where the signal-to-noise ratio (SNR) is high, deep learning has achieved great success. In many other statistical problems, the SNR may be very low. For example, in financial applications, the firm characteristic and covariates may only explain a small part of the financial returns; in healthcare systems, the uncertainty of an illness may not be predicted well from a patient's medical history. How to adapt deep learning models to excel at such tasks is an interesting direction to pursue?
+
+}
+
+
+\end{itemize}
+
+
+
