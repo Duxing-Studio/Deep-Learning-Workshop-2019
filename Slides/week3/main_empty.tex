@@ -248,6 +248,107 @@
 
 \end{frame}
 
+
+\section{Modules}
+
+\begin{frame}
+    \frametitle{Skip connections}
+    \begin{figure}[htb!]
+        \centering
+        \begin{tabular}{cc}
+        \includegraphics[scale = 0.5]{inception} & \includegraphics[scale = 0.5]{resnet2} \tabularnewline
+        (a) ``Inception'' module & (b) Skip connections
+        \end{tabular}
+        \caption{(a) The ``Inception'' module from GoogleNet. \texttt{Concat} means combining all features maps into a tensor. (b) Skip connections are added every two layers in ResNets. }\label{fig:skip}
+    \end{figure}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Skip connections}
+
+    \begin{equation}\label{eq:mapsto}
+        \xx \longmapsto \bsigma(\xx + \bF(\xx)) = \bsigma(\xx + \bW' \bsigma(\bW \xx + \bb) + \bb'),
+    \end{equation}
+
+\end{frame}
+
+\section{Autoencoders}
+
+\begin{frame}
+    \frametitle{Autoencoders}
+
+    \begin{align}
+        \ff\left(\bm{x}\right)& =\bm{W}_f\bm{x}\triangleq \hh \\
+        \bgg\left(\bm{h}\right)& =\bm{W}_g\bm{h}, \\
+        \bm{W}_f\in\mathbb{R}^{k\times d} & \text{and}  \bm{W}_g\in\mathbb{R}^{d\times k}.
+    \end{align}
+    \pause
+    
+    \begin{equation}
+        \min _{\ff,\bgg} \quad\frac{1}{n}\sum_{i=1}^{n}\mathcal{L}\left(\bm{x}_{i},\bgg\left(\bm{h}_{i}\right)\right) \, \text{with} \, \bm{h}_{i}=\ff\left(\bm{x}_{i}\right), \, \forall i \in [n].  \label{eq:AE}
+    \end{equation}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Autoencoders}
+
+    
+    \begin{figure}
+        \centering\includegraphics[scale=0.2]{AE}
+        \caption{First an input $\bm{x}$ goes through the decoder $\ff(\cdot)$, and we obtain its hidden representation $\bm{h}= \ff(\bm{x})$. Then, we use the decoder $\bgg(\cdot)$ to get $\bgg(\bm{h})$ as a reconstruction of $\bm{x}$. Finally, the loss is determined from the difference between the original input $\bm{x}$ and its reconstruction $\bgg(\ff(\bm{x}))$.}\label{fig:AE} %\TODO{give more than one layer}
+    \end{figure}
+
+\end{frame}
+
+\section{Generative adversarial networks}
+
+\begin{frame}
+    \frametitle{GAN}
+        
+    \begin{figure}
+        \centering\includegraphics[width=0.9\textwidth]{GAN}
+        \caption{GANs consist of two components, a generator $\mathcal{G}$ which generates fake samples and a discriminator $\mathcal{D}$ which differentiate the true ones from the fake ones. \label{fig:GAN}}
+    \end{figure}
+
+\end{frame}
+\begin{frame}
+    \frametitle{GAN}
+        
+    
+    \begin{equation}
+        \min_{\btheta_{\mathcal{G}}}\max_{\btheta_{\mathcal{D}}}
+        \,\mathbb{E}_{\bm{x}\sim\mathbb{P}_{\bm{X}}}\left[\log
+        \left(d\left(\bm{x}\right)\right)\right]
+        +\mathbb{E}_{\bm{z}\sim\mathbb{P}_{\bm{Z}}}\left[\log\left(1-d\left(\bg\left(\bm{z}\right)\right)\right)\right].\label{eq:GAN-original}
+    \end{equation}
+    \pause
+    \begin{equation}\label{eq:GAN-new}
+        \min_{\mathbb{P}_{\mathcal{G}}}\max_{d(\cdot)}\,\mathbb{E}_{\bm{x}\sim\mathbb{P}_{\bm{X}}}\left[\log\left(d\left(\bm{x}\right)\right)\right]+\mathbb{E}_{\bm{x}\sim\mathbb{P}_{\mathcal{G}}}\left[\log\left(1-d\left(\bm{x}\right)\right)\right].
+    \end{equation}
+    \pause
+    \begin{equation}
+        d^{*}\left(\bm{x}\right)=\frac{\mathbb{P}_{\bm{X}}\left(\bm{x}\right)}{\mathbb{P}_{\bm{X}}\left(\bm{x}\right)+\mathbb{P}_{\mathcal{G}}\left(\bm{x}\right)}.
+    \end{equation}
+    \pause
+    \begin{equation}
+        \min_{\mathbb{P}_{\mathcal{G}}}\qquad\text{JS}\left(\mathbb{P}_{\bm{X}}\;\|\;\mathbb{P}_{\mathcal{G}}\right)\label{eq:JS-min},
+    \end{equation}
+    where $\text{JS}(\cdot\|\cdot)$ denotes the Jensen--Shannon divergence
+    between two distributions
+    \begin{equation}
+        \text{JS}\left(\mathbb{P}_{\bm{X}}\|\mathbb{P}_{\mathcal{G}}\right)=\frac{1}{2}\text{KL}\big(\mathbb{P}_{\bm{X}}\;\|\;\tfrac{\mathbb{P}_{\bm{X}}+\mathbb{P}_{\mathcal{G}}}{2}\big)+\frac{1}{2}\text{KL}\big(\mathbb{P}_{\mathcal{G}}\;\|\;\tfrac{\mathbb{P}_{\bm{X}}+\mathbb{P}_{\mathcal{G}}}{2}\big).
+    \end{equation}
+    it minimizes
+    the Wasserstein distance between $\mathbb{P}_{\bm{X}}$ and $\mathbb{P}_{\mathcal{G}}$:
+    \begin{equation}
+        \min_{\btheta_{\mathcal{G}}}\quad \text{WS}\left(\mathbb{P}_{\bm{X}}\|\mathbb{P}_{\mathcal{G}}\right)\;\;=\;\;\min_{\btheta_{\mathcal{G}}}\sup_{f:f\text{ 1-Lipschitz}}\mathbb{E}_{\bm{x}\sim\mathbb{P}_{\bm{X}}}
+        \left[f\left(\bm{x}\right)\right]-\mathbb{E}_{\bm{x}\sim
+        \mathbb{P}_{\mathcal{G}}}\left[f\left(\bm{x}\right)\right],\label{eq:WS-GAN}
+    \end{equation}
+
+\end{frame}
+
 \begin{frame}[standout]
     Questions
 \end{frame}
