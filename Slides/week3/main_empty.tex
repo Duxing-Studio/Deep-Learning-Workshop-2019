@@ -312,17 +312,21 @@
     \end{figure}
 
 \end{frame}
+
 \begin{frame}
     \frametitle{GAN}
-        
-    
+
     \begin{equation}
         \min_{\btheta_{\mathcal{G}}}\max_{\btheta_{\mathcal{D}}}
         \,\mathbb{E}_{\bm{x}\sim\mathbb{P}_{\bm{X}}}\left[\log
         \left(d\left(\bm{x}\right)\right)\right]
         +\mathbb{E}_{\bm{z}\sim\mathbb{P}_{\bm{Z}}}\left[\log\left(1-d\left(\bg\left(\bm{z}\right)\right)\right)\right].\label{eq:GAN-original}
     \end{equation}
-    \pause
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{GAN}
     \begin{equation}\label{eq:GAN-new}
         \min_{\mathbb{P}_{\mathcal{G}}}\max_{d(\cdot)}\,\mathbb{E}_{\bm{x}\sim\mathbb{P}_{\bm{X}}}\left[\log\left(d\left(\bm{x}\right)\right)\right]+\mathbb{E}_{\bm{x}\sim\mathbb{P}_{\mathcal{G}}}\left[\log\left(1-d\left(\bm{x}\right)\right)\right].
     \end{equation}
@@ -342,7 +346,7 @@
     it minimizes
     the Wasserstein distance between $\mathbb{P}_{\bm{X}}$ and $\mathbb{P}_{\mathcal{G}}$:
     \begin{equation}
-        \min_{\btheta_{\mathcal{G}}}\quad \text{WS}\left(\mathbb{P}_{\bm{X}}\|\mathbb{P}_{\mathcal{G}}\right)\;\;=\;\;\min_{\btheta_{\mathcal{G}}}\sup_{f:f\text{ 1-Lipschitz}}\mathbb{E}_{\bm{x}\sim\mathbb{P}_{\bm{X}}}
+        \min_{\btheta_{\mathcal{G}}}\, \text{WS}\left(\mathbb{P}_{\bm{X}}\|\mathbb{P}_{\mathcal{G}}\right)\;\;=\;\;\min_{\btheta_{\mathcal{G}}}\sup_{f:f\text{ 1-Lipschitz}}\mathbb{E}_{\bm{x}\sim\mathbb{P}_{\bm{X}}}
         \left[f\left(\bm{x}\right)\right]-\mathbb{E}_{\bm{x}\sim
         \mathbb{P}_{\mathcal{G}}}\left[f\left(\bm{x}\right)\right],\label{eq:WS-GAN}
     \end{equation}
