@@ -1,0 +1,38 @@
+
+\define@key{beamerframe}{c}[true]{% centered
+  \beamer@frametopskip=0pt plus 1fill\relax%
+  \beamer@framebottomskip=0pt plus 1fill\relax%
+  \beamer@frametopskipautobreak=0pt plus .4\paperheight\relax%
+  \beamer@framebottomskipautobreak=0pt plus .6\paperheight\relax%
+  \def\beamer@initfirstlineunskip{}%
+}
+
+\AtBeginSection{
+\ifbeamer@inframe
+  \sectionpage
+\else
+  \frame[c]{\sectionpage}
+\fi
+}
+
+\providebool{duxing@standout}
+\define@key{beamerframe}{standout}[true]{%
+  \booltrue{duxing@standout}
+  \begingroup
+  \setbeamercolor{footline1}{fg=white, bg=sysugreen}
+  \setbeamercolor{footline2}{fg=white, bg=sysugreen}
+  \setbeamercolor{normal text}{fg=white, bg=sysugreen}
+  \setbeamercolor{structure}{fg=white}
+  \setbeamercolor{palette primary}{use=structure,fg=structure.fg}
+    \setkeys{beamerframe}{c}
+  \centering
+  \usebeamercolor[fg]{palette primary}
+  \usebeamerfont{standout}
+}
+  \apptocmd{\beamer@reseteecodes}{%
+    \ifbool{duxing@standout}{
+      \endgroup
+      
+      \boolfalse{duxing@standout}
+    }{}
+  }{}{}
